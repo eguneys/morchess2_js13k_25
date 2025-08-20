@@ -1,6 +1,6 @@
 import { Loop, TouchMouse } from './loop_input';
 import './style.css'
-import { appr, lerp, type XY, type XYWH } from './util';
+import { lerp, type XY, type XYWH } from './util';
 
 const w = 1920
 const h = 1080
@@ -208,7 +208,7 @@ function render_gameplay() {
 
 }
 
-function render_card(card: Card, text1: string, text2?: string, text3?: string) {
+function render_card(card: Card, text1: string, text2?: string, _text3?: string) {
     let { color, role, box: [x, y, w, h] } = card
     rect(x, y, w, h, colors.purple)
 
