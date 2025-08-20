@@ -41,66 +41,66 @@ function reset_cards() {
     let cw = 228
     let ch = 280
 
-    white = [
-        {
-            color: colors.white,
-            role: 'king',
-            box: [a + 40, b + 30, cw, ch]
-        },
-        {
-            color: colors.white,
-            role: 'pawn',
-            box: [a + 40 + 1 * (aw - 60) / 6, b + 30, cw, ch]
-        },
-        {
-            color: colors.white,
-            role: 'knight',
-            box: [a + 40 + 2 * (aw - 60) / 6, b + 30, cw, ch]
-        },
-        {
-            color: colors.white,
-            role: 'bishop',
-            box: [a + 40 + 3 * (aw - 60) / 6, b + 30, cw, ch]
-        },
-        {
-            color: colors.white,
-            role: 'queen',
-            box: [a + 40 + 4 * (aw - 60) / 6, b + 30, cw, ch]
-        },
-        {
-            color: colors.white,
-            role: 'rook',
-            box: [a + 40 + 5 * (aw - 60) / 6, b + 30, cw, ch]
-        },
-    ]
     black = [
         {
             color: colors.black,
             role: 'king',
-            box: [a + 40, b2 - 30 - ch, cw, ch]
+            box: [a + 40, b + 30, cw, ch]
         },
         {
             color: colors.black,
             role: 'pawn',
-            box: [a + 40 + 1 * (aw - 60) / 6, b2 - 30 - ch, cw, ch]
+            box: [a + 40 + 1 * (aw - 60) / 6, b + 30, cw, ch]
         },
         {
             color: colors.black,
             role: 'knight',
-            box: [a + 40 + 2 * (aw - 60) / 6, b2 - 30 - ch, cw, ch]
+            box: [a + 40 + 2 * (aw - 60) / 6, b + 30, cw, ch]
         },
         {
             color: colors.black,
             role: 'bishop',
-            box: [a + 40 + 3 * (aw - 60) / 6, b2 - 30 - ch, cw, ch]
+            box: [a + 40 + 3 * (aw - 60) / 6, b + 30, cw, ch]
         },
         {
             color: colors.black,
             role: 'queen',
-            box: [a + 40 + 4 * (aw - 60) / 6, b2 - 30 - ch, cw, ch]
+            box: [a + 40 + 4 * (aw - 60) / 6, b + 30, cw, ch]
         },
         {
             color: colors.black,
+            role: 'rook',
+            box: [a + 40 + 5 * (aw - 60) / 6, b + 30, cw, ch]
+        },
+    ]
+    white = [
+        {
+            color: colors.white,
+            role: 'king',
+            box: [a + 40, b2 - 30 - ch, cw, ch]
+        },
+        {
+            color: colors.white,
+            role: 'pawn',
+            box: [a + 40 + 1 * (aw - 60) / 6, b2 - 30 - ch, cw, ch]
+        },
+        {
+            color: colors.white,
+            role: 'knight',
+            box: [a + 40 + 2 * (aw - 60) / 6, b2 - 30 - ch, cw, ch]
+        },
+        {
+            color: colors.white,
+            role: 'bishop',
+            box: [a + 40 + 3 * (aw - 60) / 6, b2 - 30 - ch, cw, ch]
+        },
+        {
+            color: colors.white,
+            role: 'queen',
+            box: [a + 40 + 4 * (aw - 60) / 6, b2 - 30 - ch, cw, ch]
+        },
+        {
+            color: colors.white,
             role: 'rook',
             box: [a + 40 + 5 * (aw - 60) / 6, b2 - 30 - ch, cw, ch]
         },
@@ -131,6 +131,9 @@ function _update(dt: number) {
     }
     if (cursor_up) {
 
+        if (is_intro) {
+            is_intro = false
+        }
     }
 
 
@@ -161,42 +164,12 @@ function render_gameplay() {
     cx.fillStyle = colors.darkblue
     cx.fillRect(0, 0, 1920, 1080)
 
-    line(a + 70, b, a + 70 + 100, b)
-    line(a, b + 70, a, b + 70 + 100)
-    circ(a + 70, b, 12)
-    circ(a, b + 70, 12)
+    let b_color = colors.black
+    render_borders(a, b, a2, b2, b_color)
 
-
-    line(a2 - 70, b, a2 - 70 - 100, b)
-    line(a2, b + 70, a2, b + 70 + 100)
-    circ(a2 - 70, b, 12)
-    circ(a2, b + 70, 12)
-
-    line(a + 70, b2, a + 70 + 100, b2)
-    line(a, b2 - 70, a, b2 - 70 - 100)
-    circ(a + 70, b2, 12)
-    circ(a, b2 - 70, 12)
-
-    line(a2 - 70, b2, a2 - 70 - 100, b2)
-    line(a2, b2 - 70, a2, b2 - 70 - 100)
-    circ(a2 - 70, b2, 12)
-    circ(a2, b2 - 70, 12)
-
-
-    line(a, hb - 40, a, hb + 40)
-    line(a, hb, a + 70, hb)
-    circ(a, hb - 40, 12)
-    circ(a, hb + 40, 12)
-
-    line(a2, hb - 40, a2, hb + 40)
-    line(a2, hb, a2 - 70, hb)
-    circ(a2, hb - 40, 12)
-    circ(a2, hb + 40, 12)
-
-
-    sketch_horiz(a + 200, b, a2 - 200, { skew: 10 })
-    sketch_horiz(a + 200, b2, a2 - 200, { skew: -10 })
-    sketch_horiz(a + 200, hb, a2 - 200, { skew: 0 })
+    sketch_horiz(a + 200, b, a2 - 200, { skew: 10, color: b_color })
+    sketch_horiz(a + 200, b2, a2 - 200, { skew: -10, color: b_color })
+    sketch_horiz(a + 110, hb, a2 - 100, { skew: 0, color: b_color })
 
     rect(a2 + 40, b, 300, 300, colors.black)
     rect(a2 + 40, b2 - 310, 300, 300, colors.black)
@@ -206,10 +179,57 @@ function render_gameplay() {
         render_card(black[i], 'Home')
     }
 
+
+}
+
+function render_evals() {
+
+    eval_bar(200, hb - 12)
+}
+
+function eval_bar(x: number, y: number) {
+    rect(x, y, 400, 24, colors.darkred)
+}
+
+function render_borders(a: number, b: number, a2: number, b2: number, color: Color) {
+    let opts = {color}
+    line(a + 70, b, a + 70 + 100, b, opts)
+    line(a, b + 70, a, b + 70 + 100, opts)
+    circ(a + 70, b, 12, color)
+    circ(a, b + 70, 12, color)
+
+
+    line(a2 - 70, b, a2 - 70 - 100, b, opts)
+    line(a2, b + 70, a2, b + 70 + 100, opts)
+    circ(a2 - 70, b, 12, color)
+    circ(a2, b + 70, 12, color)
+
+    line(a + 70, b2, a + 70 + 100, b2, opts)
+    line(a, b2 - 70, a, b2 - 70 - 100, opts)
+    circ(a + 70, b2, 12, color)
+    circ(a, b2 - 70, 12, color)
+
+    line(a2 - 70, b2, a2 - 70 - 100, b2, opts)
+    line(a2, b2 - 70, a2, b2 - 70 - 100, opts)
+    circ(a2 - 70, b2, 12, color)
+    circ(a2, b2 - 70, 12, color)
+
+
+    line(a, hb - 40, a, hb + 40, opts)
+    line(a, hb, a + 70, hb, opts)
+    circ(a, hb - 40, 12, color)
+    circ(a, hb + 40, 12, color)
+
+    line(a2, hb - 40, a2, hb + 40, opts)
+    line(a2, hb, a2 - 70, hb, opts)
+    circ(a2, hb - 40, 12, color)
+    circ(a2, hb + 40, 12, color)
 }
 
 function render_card(card: Card, text1: string, text2?: string, _text3?: string) {
     let { color, role, box: [x, y, w, h] } = card
+    rect(x - 4, y - 4, w + 8, h + 8, colors.lightgray)
+    rect(x - 1, y - 1, w + 2, h + 2, colors.black)
     rect(x, y, w, h, colors.purple)
 
     //round_bg(x + 230 / 2, y + 10 + 70, 100, color)
@@ -264,9 +284,11 @@ function sketch_horiz(x: number, y: number, x2: number, opts: SketchLineOptions 
 
     let skew = opts.skew ?? 0
     cx.beginPath()
-    for (let i = x; i < x2; i += 20) {
-        cx.moveTo(i, y - 10)
-        cx.lineTo(i + skew, y + 10)
+    let m = x + (x2 - x) / 2
+    for (let i = x; i <= x2; i += Math.abs(i - m) / m * 100 + 20) {
+        let a = i
+        cx.moveTo(a, y - 10)
+        cx.lineTo(a + skew, y + 10)
     }
     cx.stroke()
 }
@@ -313,7 +335,7 @@ function round_bg(x: number, y: number, radius: number, color: Color, speed = 1)
     cx.fillStyle = color
     let grid_spacing = radius * 0.2
 
-    let a = (t * 0.05 * speed) % grid_spacing
+    let a = (t * 0.02 * speed) % grid_spacing
     for (let i = -100; i < 200; i++) {
         for (let j = -100; j < 200; j++) {
             let _x = i * grid_spacing
