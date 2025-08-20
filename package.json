@@ -1,0 +1,19 @@
+{
+  "name": "morchess2_js13k_25",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "clean": "rimraf dist && rimraf dist.zip",
+    "zip": "cd dist && 7z a ../dist.zip -mx9 && cd .. && cd tools && advzip.exe --recompress --shrink-extra ../dist.zip",
+    "dev": "vite --port=3000",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "rimraf": "^6.0.1",
+    "terser": "^5.43.1",
+    "typescript": "~5.8.3",
+    "vite": "^7.1.2"
+  }
+}
