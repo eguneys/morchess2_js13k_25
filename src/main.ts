@@ -179,6 +179,7 @@ function render_gameplay() {
         render_card(black[i], 'Home')
     }
 
+    render_evals()
 
 }
 
