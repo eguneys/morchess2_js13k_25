@@ -1,0 +1,29 @@
+knight control center
+pawn block center
+pawn solidify center
+bishop activate
+offer bishop trade
+ block bishop trade
+knight block center
+knight solidify
+pawn prophylaxis
+flank pawn challenge center
+bishop hangs
+flank pawn solidify center
+knight defend bishop
+knight sacrifice f7
+ knight fork rook and queen
+ bishop discovered attack on bishop
+ king is exposed
+king capture knight
+flank pawn kick knight
+ king weakens
+bishop captures bishop
+pawn captures knight
+bishop check
+king flee
+flank pawn captures pawn
+queen fork king and bishop
+ knight block check
+queen capture bishop
+knight fork king and queen

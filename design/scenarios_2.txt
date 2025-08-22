@@ -1,0 +1,106 @@
+https://lichess.org/yJkR9ukH8tqG
+
+pawn control center block center
+
+pawn flank control center
+
+knight control center
+
+pawn flank solidify
+
+pawn control center challenge flank
+
+pawn exchange
+knight centralize
+
+knight control center
+
+knight control center
+
+knight control center
+
+bishop control center
+
+pawn defensive
+
+pawn flank extend weaken king
+
+bishop passive
+
+queen control center
+
+castle
+
+castle
+
+pawn prophylaxis
+
+pawn flank extend create tension
+
+pawn push release tension kick knight
+
+knight retreat defend king
+
+bishop passive
+
+pawn flank extend attack king
+
+rook on semi open file
+
+pawn storm kick knight attack king
+
+knight retreat attack king
+
+pawn storm on 6th rank trap bishop attack king
+
+pawn capture pawn weaken king
+
+pawn storm attack king
+
+king flee
+
+knight occupy center join the attack
+
+bishop challenge knight
+
+knight captures defender
+
+knight captures knight
+
+knight adventures
+
+knight grab pawn kick queen
+
+rook counter attack knight
+
+bishop grab pawn defend knight
+
+queen eye king attack knight
+
+pawn storm kick knight
+
+knight occupy outpost block bishop
+
+pawn storm protected on 6th rank
+
+pawn capture pawn weaken king
+
+bishop exchange vs knight
+
+pawn breakthrough on king
+
+rook captures knight
+
+rook forks king and queen
+
+king flees
+
+rook exchange vs queen
+
+rook join attack
+
+bishop grabs pawn counter attack king
+
+queen threatens mate
+
+rook sacrifices desperado

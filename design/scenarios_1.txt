@@ -1,0 +1,55 @@
+pawn control center block center
+
+pawn control center block center
+
+pawn challenge center from flank
+
+pawn chain solidify
+
+knight control center
+
+bishop activate
+
+bishop offer trade
+
+trade bishops
+queen activate
+
+king castle
+
+pawn extend flank release center tension kick queen
+
+pawn break cramped position
+
+pawn chain solidify
+
+bishop offer trade
+
+pawn block trade kick bishop extend flank pawn duo
+
+bishop retreat
+
+pawn extend flank kick queen solid
+
+queen passive
+
+bishop passive
+
+queen pin knight
+
+queen defend knight
+
+knight attack pinned knight
+
+rook defend knight
+
+pawn break flank
+
+castle unpin knight
+
+knight exchange
+queen exchange
+
+pawn exchange
+
+rook grabs pawn

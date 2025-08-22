@@ -1,0 +1,102 @@
+pawn block center control center space open home
+
+pawn block center kick knight space
+
+pawn control center solidify center space open home
+
+knight control center solidify center
+
+pawn solidify flank space
+
+pawn extend flank space
+
+pawn kick knight space
+
+pawn capture free pawn weak
+
+pawn prophylaxis sacrifice weak pawn
+
+pawn kick bishop space
+
+bishop fianchetto control center
+
+knight control center
+
+knight occupy center eye weak square threaten bishop
+
+knight check king occupy outpost
+
+bishop activate
+
+bishop activate knight coordinate
+
+queen activate
+
+pawn en passant weaken king
+
+bishop capture pawn kick rook expose king
+
+bishop win exchange weak king
+
+queen coordinate bishop join attack
+
+queen check king
+
+bishop join attack
+
+bishop check
+
+queen check mate in 6
+
+pawn recapture threaten mate missed mate
+
+queen trade accepted
+
+
+
+
+
+
+knight control center
+
+knight occupy center
+
+pawn solidify f7 open home
+
+knight retreat cramp pieces
+
+knight flank tricks
+
+pawn challenge center space create weak hole
+
+knight retreat
+
+knight regroup control center
+
+bishop capture weak pawn
+
+bishop retreat
+
+bishop activate
+
+bishop retreat
+
+king flee break castle
+
+knight shuffle
+
+knight control center block coordination
+
+pawn lash out kick bishop
+
+pawn recapture
+
+bishop counter attack knight sacrifice rook
+
+pawn block coordinate
+
+pawn flank tricks
+
+knight capture only move
+
+queen join defense offer trade

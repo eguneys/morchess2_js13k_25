@@ -1,0 +1,104 @@
+knight bishop queen rooks king
+home   home   home  home  home
+
+knight
+ home flank,natural
+ flank center,defend king,eye king,bother
+ natural center,defend king,bother
+ center *
+ defend king center,flank
+ eye king center,flank
+ bother center,flank,defend king
+ invade center,flank
+ outpost center,flank
+
+bishop
+ home passive,active,pin,fianchetto
+ passive active,defend king
+ active passive,pin,infiltrate,eye king
+ pin    active,eye king
+ fianchetto eye king
+ defend king passive,active
+ infiltrate active,passive
+ eye king active,passive
+
+queen
+ home passive,active
+ passive centralized,bishop battery,rook battery
+ active centralized,infiltrate,eye king
+ centralized *
+ infiltrate *
+ eye king *
+ bishop battery *
+ rook battery *
+
+rooks
+ home connected rooks,rook on open file
+ connected rooks rook battery,rook on open file
+ rook on open file rook lift,rook on the 7th
+ rook lift rook on the 7th, rook battery
+
+king
+ castle
+ weakened
+ exposed
+ running
+
+control center: +1 +2 +3 +4
+gain space: +1 +2 +3 +4
+
+
+pawn home pawn center pawn tension
+          pawn space  pawn extend  pawn thorn
+                                   pawn outpost
+          pawn chain
+          doubled pawn
+          isolated pawn
+          backward pawn
+          
+          passed pawn
+          connected passed pawn
+          outside passed pawn
+          advanced passed pawn
+
+initiate an attack
+ pawn storm        -pawn
+ sacrifice pawn    -pawn
+ sacrifice knight  -knight, -pawn
+ sacrifice exchange -rook, -knight -bishop
+ sacrifice queen   -queen, -rook -knight -pawn
+
+
+tactics
+ trap piece 
+  pawn chain, bishop active bishop pin, -pawn chain pawn weaknesses, -bishop
+  pawn chain, knight eye king knight bother knight invade, -pawn chain pawn weaknesses, -knight
+  pawn chain, queen eye king queen infiltrate, -pawn chain pawn weaknesses, -queen
+ fork 
+  -knight home, -bishop home -king castle, -bishop
+  -knight home, -queen home -king castle,, -queen
+  -knight home, -rook home -king castle,, -rook
+  -pawn home, -knight home -rook home, -pawn, -rook -knight
+  -pawn home, -knight home -bishop home, -pawn, -bishop -knight
+  -pawn home, -bishop home -rook home, -pawn, -rook -bishop
+  -pawn home, -bishop home -king castle, -pawn, -bishop
+  -pawn home, -knight home -king castle, -pawn, -knight
+  -pawn home, -rook home -king castle, -pawn, -rook
+  -pawn home, -queen home -king castle, -pawn, -queen
+ skewer
+  -bishop home, -king castle,-bishop,-rook -queen
+ discovered check
+  -bishop home
+ backrank mate
+ queen checkmate
+ smothered mate
+ arabian mate
+
+ skewer
+ queen checkmate
+ zugzwang
+ opposition
+ pawn grab
+ stalemate
+ ladder mate
+ promotion

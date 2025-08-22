@@ -1,0 +1,95 @@
+bring minors:
+                           knight center
+                           knight defend king
+            knight flank   knight eye king
+knight home knight natural knight bother knight invade
+                                         knight outpost knight eye king
+
+
+            bishop passive    bishop defend king
+bishop home bishop active     bishop invade
+            bishop pin
+            bishop fianchetto bishop eye king
+
+
+
+queen home queen passive  queen centralized
+           queen active   queen infiltrate
+                          queen eye king
+                          queen bishop battery
+                          queen rook battery
+
+
+rooks home  connect rooks rook battery rook on the 7th
+            rook on open file rook lift
+
+king
+ castle
+ weakened
+ exposed
+ running
+
+
+control center: +1 +2 +3 +4
+gain space: +1 +2 +3 +4
+
+castle: -knight home -bishop home
+
+pawn home pawn center pawn tension
+          pawn space  pawn extend  pawn thorn
+                                   pawn outpost
+          pawn chain
+          doubled pawn
+          isolated pawn
+          backward pawn
+          
+          passed pawn
+          connected passed pawn
+          outside passed pawn
+          advanced passed pawn
+
+
+phases:
+opening
+middle game maneuver
+middle game after math
+endgame
+
+
+initiate an attack:
+ pawn storm
+ sacrifice pawn
+ sacrifice knight
+ sacrifice rook
+ sacrifice queen
+
+tactic search:
+ consume time
+
+
+tactics:
+
+trap piece
+fork
+skewer
+discovered check
+backrank mate
+queen checkmate
+smothered mate
+arabian mate
+
+endgame:
+
+king shelter king walk king center king support
+             king cut off
+
+endgame tactics:
+
+zugzwang
+opposition
+skewer
+pawn grab
+stalemate
+ladder mate
+promotion
+queen checkmate
