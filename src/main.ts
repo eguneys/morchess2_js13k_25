@@ -31,7 +31,7 @@ function _init() {
 
     t = 0
 
-    is_intro = true
+    is_intro = false
 
     cursor_box0 = [hw, hh]
     cursor_box = [hw, hh, 16, 16]
@@ -39,11 +39,9 @@ function _init() {
     cursor_up = undefined
     cursor_bg_speed = 1
     cursor_bg_speed_lerping = 1
-
-    reset_cards()
-
 }
 
+// @ts-ignore
 function reset_cards() {
     let cw = 228
     let ch = 280
@@ -157,7 +155,7 @@ function _render() {
     if (is_intro) {
         render_intro()
     } else {
-        render_gameplay()
+        render_gameplay2()
     }
     let float_x = Math.sin(t * 0.001) * 8
     let float_y = Math.cos(t * 0.002) * 4
@@ -167,6 +165,11 @@ function _render() {
     cursor(cursor_box[0], cursor_box[1])
 }
 
+function render_gameplay2() {
+
+}
+
+// @ts-ignore
 function render_gameplay() {
     cx.fillStyle = colors.darkblue
     cx.fillRect(0, 0, 1920, 1080)
