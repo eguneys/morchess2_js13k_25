@@ -1,4 +1,5 @@
 import * as c from './choices'
+import { arr_shuffle } from './random'
 import type { XY } from './util'
 
 
@@ -7,10 +8,12 @@ export type Card = {
     r: c.Role
     p: c.Property
     pos: XY
+    choices?: c.Property[]
 }
 
 export type Cards = {
     cards: Card[]
+    turn: c.Color
 }
 
 function card(r: c.Role, p: c.Property, color: c.Color): Card {
@@ -20,7 +23,13 @@ function card(r: c.Role, p: c.Property, color: c.Color): Card {
 
 
 export function card_choices(card: Card, cc: Card[]) {
-    return c.rr_by_role[card.r].find(_ => _[0] === card.p)?.[1].filter(_ => {
+    let res = c.rr_by_role[card.r].find(_ => _[0] === card.p)?.[1]
+
+    if (res?.length === 0) {
+        return arr_shuffle(c.rr_by_role[card.r].map(_ => _[0])).slice(0, 3)
+    }
+
+    return res?.filter(_ => {
         let pp = c.prequisites.find(p => p[0] === _)
         if (pp) {
             for (let p of pp[1]) {
@@ -62,9 +71,11 @@ export function prop_string(p: c.Property) {
     }
 }
 
+
 export function cards(): Cards {
 
     return {
+        turn: c.white,
         cards: [
             card(c.bishop, c.p_bishop_home, c.black),
             card(c.knight, c.p_knight_home, c.black),

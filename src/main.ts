@@ -4,11 +4,31 @@ import { appr, box_intersect, type XY, type XYWH } from './util';
 import { play, sounds } from './play_sounds'
 import { card_choices as _card_choices, cards, prop_string, type Card, type Cards } from './chess_logic'
 import { bishop, black, king, knight, pawn, queen, rook, white, type Property } from './choices';
+import { arr_shuffle } from './random';
 
 const card_choices = (c: Card) => {
-    return _card_choices(c, cc.cards.filter(a => a.c === c.c))
+    if (!c.choices) {
+        c.choices = _card_choices(c, cc.cards.filter(a => a.c === c.c))
+    }
+    return c.choices
 }
 
+
+export function ai_play(cc: Cards) {
+
+    let bb = cc.cards.filter(_ => _.c === black)
+
+    let card = arr_shuffle(bb)[0]
+    let ccc = card_choices(card)
+
+    if (ccc === undefined || ccc.length === 0) {
+
+    } else {
+        prop_changes.push([card, arr_shuffle(ccc)[0]])
+        t_prop_change = 1000
+    }
+
+}
 
 const w = 1920
 const h = 1080
@@ -37,7 +57,13 @@ type PropChange = [Card, Property]
 let prop_changes: PropChange[]
 let t_prop_change: number
 
+let t_ai_think: number
+let t_begin: number
+
 function _init() {
+
+    t_begin = 0
+    t_ai_think = 0
 
     prop_changes = []
     t_prop_change = 0
@@ -62,6 +88,7 @@ function _init() {
 
 
 function _update(dt: number) {
+
     t += dt
 
     if (t_select > 0) {
@@ -81,11 +108,26 @@ function _update(dt: number) {
 
             prop_changes.forEach(c => {
                 c[0].p = c[1]
+                c[0].choices = undefined
             })
 
             prop_changes = []
+
+            end_turn()
         }
     }
+
+    t_begin += dt
+
+    if (cc.turn === black) {
+        if (t_ai_think > 0) {
+            t_ai_think -= dt
+            if (t_ai_think <= 0) {
+                ai_play(cc)
+            }
+        }
+    }
+
 
     if (cursor_down) {
         cursor_bg_speed = 0.3
@@ -121,7 +163,7 @@ function _update(dt: number) {
     }
 
     for (let c of cc.cards) {
-        if (c.c === black) {
+        if (t_begin < 5000 || cc.turn === black || c.c === black) {
             continue
         }
         if (box_intersect(card_box(c), cursor_box)) {
@@ -165,6 +207,16 @@ function _update(dt: number) {
 }
 let i = 0
 
+
+function end_turn() {
+    cc.turn = cc.turn === black ? white : black
+
+    if (cc.turn === black) {
+        t_ai_think = 1000 + Math.random() * 2000
+    }
+}
+
+
 function update_card(c: Card, _dt: number) {
     if (selected_card === c) {
         if (selected_prop) {
@@ -193,7 +245,27 @@ function render_gameplay2() {
         render_card(c)
     }
 
-    render_my_turn()
+    if (t_begin < 5000) {
+        render_begin()
+    } else if (cc.turn === white) {
+        render_my_turn()
+    } else {
+        render_ai_turn()
+    }
+}
+
+function render_begin() {
+    let a = Math.sin(t * 0.002) * 8
+    if (t_begin < 2000) {
+        text(`[${colors.yellow}]3[/] [${colors.red}]2[/] [${colors.green}]1[/]...`, 712 - a, 1000, 140, { gap: 4 + Math.sin(t * 0.002) * 2, outline: 6, wave: 6 })
+    } else {
+        text(`Let's play [${colors.blue}]chess!`, 312 - a, 1000, 140, { gap: 4 + Math.sin(t * 0.002) * 2, outline: 6, wave: 6 })
+    }
+}
+
+function render_ai_turn() {
+    let a = Math.sin(t * 0.002) * 8
+    text(`[${colors.black}]Cat[/]'[${colors.black}]s[/] Turn`, 512 - a, 1000, 140, { gap: 12, outline: 6, wave: 6 })
 }
 
 function render_my_turn() {
@@ -231,7 +303,7 @@ function render_card(c: Card) {
 
     if (prop_change) {
         let color = t_prop_change % 350 < 200 ? colors.white : colors.purple
-        text(`[${color}]${prop_string(prop_change[1])!}[/]`, x, y, 50, { shadow: 4 })
+        text(`[${color}]${prop_string(prop_change[1])!}[/]`, x, y, color === colors.white ? 50 : 60, { shadow: 4 })
     } else {
         text(prop_string(c.p)!, x, y, 50, { shadow: 4 })
     }
@@ -744,7 +816,7 @@ function text(text: string, x: number, y: number, px: number, opts: TextOptions 
         if (opts.outline) {
             cx.lineJoin = 'round'
             cx.lineWidth = opts.outline
-            cx.strokeStyle = colors.black
+            cx.strokeStyle = color === colors.black ? colors.white : colors.black
             cx.strokeText(text[i], x, y + a(i))
         }
 
