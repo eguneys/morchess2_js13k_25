@@ -7,11 +7,11 @@ let tactic = await generate(.20, (i: number) => {
 });
 
 let ring = await generate(.20, (i: number) => {
-    return sqr(i / 100 * 2 * Math.PI * 420) * 0.1; 
+    return saw(i / 44100 * 2 * Math.PI * sin(i < 2000 ? 30 : 60) * 800) 
 });
 
 let click = await generate(.20, (i: number) => {
-    return (i*=-999)&&1.6 * sin(i / (20 + sin(i/900 + sin(i / 440 + sin(i / 222))) - i / 400))
+    return (i*=-999)&&1.6 * sin(i / (100 + sin(i/220 + sin(i / 440 + sin(i / 222))) - i / 400))
 });
 
 export const sounds = {

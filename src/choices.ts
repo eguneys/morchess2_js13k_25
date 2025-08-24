@@ -89,7 +89,7 @@ export const t_stalemate = id++
 export const t_lader_mate = id++
 export const t_promotion = id++
 
-export const PP = {
+export const PP: Record<string, Property> = {
     p_knight_home,
     p_knight_flank,
     p_knight_natural,
@@ -237,6 +237,7 @@ export const rr_pawns: SResource[] = [
 
 
 export const rr_king: SResource[] = [
+    [p_king_home, [p_king_castled]],
     [p_king_e_shelter, [p_king_e_walk]],
     [p_king_e_walk, [p_king_e_center]],
     [p_king_e_center, [p_king_e_support_pawn]],
@@ -265,14 +266,28 @@ export const pawn_weaknesses: Property[] = [
     p_pawn_backward_pawn
 ]
 
-
 export type Role = 1 | 2 | 3 | 4 | 5 | 6
-export const knight: Role = 1
-export const bishop: Role = 2
-export const rook: Role = 3
-export const king: Role = 4
-export const queen: Role = 5
-export const pawn: Role = 6
+export const queen: Role = 1
+export const rook: Role = 2
+export const bishop: Role = 3
+export const knight: Role = 4
+export const pawn: Role = 5
+export const king: Role = 6
+
+export type Color = 0 | 1
+export const white = 0
+export const black = 1
+
+export const rr_by_role: Record<Role, SResource[]> = {
+    [queen]: rr_queen,
+    [bishop]: rr_bishop,
+    [king]: rr_king,
+    [pawn]: rr_pawns,
+    [rook]: rr_rooks,
+    [knight]: rr_knight,
+}
+
+
 
 // tactic, prequisites, opponent prequisites, remove, opponent remove
 export type Tactic = [Property[], Property[], Property[], Property[], number]

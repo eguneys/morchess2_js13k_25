@@ -1,10 +1,14 @@
 import { Loop, TouchMouse } from './loop_input';
 import './style.css'
-import { appr, type XY, type XYWH } from './util';
+import { appr, box_intersect, type XY, type XYWH } from './util';
 import { play, sounds } from './play_sounds'
-import { hey } from './chess_logic'
+import { card_choices as _card_choices, cards, prop_string, type Card, type Cards } from './chess_logic'
+import { bishop, black, king, knight, pawn, queen, rook, white, type Property } from './choices';
 
-hey()
+const card_choices = (c: Card) => {
+    return _card_choices(c, cc.cards.filter(a => a.c === c.c))
+}
+
 
 const w = 1920
 const h = 1080
@@ -21,7 +25,28 @@ let cursor_up: XY | undefined
 
 let is_intro: boolean
 
+let cc: Cards
+
+let selected_card: Card | undefined
+let hovering_prop: number
+let selected_prop: number
+let t_select: number
+
+type PropChange = [Card, Property]
+
+let prop_changes: PropChange[]
+let t_prop_change: number
+
 function _init() {
+
+    prop_changes = []
+    t_prop_change = 0
+
+    cc = cards()
+    selected_card = undefined
+    hovering_prop = -1
+    selected_prop = -1
+    t_select = 0
 
     t = 0
 
@@ -39,6 +64,29 @@ function _init() {
 function _update(dt: number) {
     t += dt
 
+    if (t_select > 0) {
+        t_select -= dt
+        if (t_select < 0) {
+            t_select = 0
+
+            selected_card = undefined
+            selected_prop = -1
+        }
+    }
+
+    if (t_prop_change > 0) {
+        t_prop_change -= dt
+        if (t_prop_change < 0) {
+            t_prop_change = 0
+
+            prop_changes.forEach(c => {
+                c[0].p = c[1]
+            })
+
+            prop_changes = []
+        }
+    }
+
     if (cursor_down) {
         cursor_bg_speed = 0.3
     } else {
@@ -46,10 +94,56 @@ function _update(dt: number) {
         cursor_bg_speed = 0.6
     }
     if (cursor_up) {
-        play(sounds.click)
 
         if (is_intro) {
             is_intro = false
+        }
+
+        if (selected_card !== undefined) {
+            let pp = card_choices(selected_card)
+
+            if (pp !== undefined) {
+                for (let i = 0; i < pp.length; i++) {
+                    if (box_intersect(c_text_xy(selected_card, i, pp.length), cursor_box)) {
+                        play(sounds.click)
+                        selected_prop = i
+                        t_select = 200
+
+                        let cc: PropChange = [selected_card!, card_choices(selected_card!)![selected_prop]]
+                        prop_changes.push(cc)
+                        t_prop_change = 800
+                    }
+                }
+            }
+        }
+
+
+    }
+
+    for (let c of cc.cards) {
+        if (c.c === black) {
+            continue
+        }
+        if (box_intersect(card_box(c), cursor_box)) {
+            if (selected_card !== c) {
+                play(sounds.ring)
+            }
+            selected_card = c
+        }
+    }
+
+
+
+    hovering_prop = -1
+    if (selected_card !== undefined) {
+        let pp = card_choices(selected_card)
+
+        if (pp !== undefined) {
+            for (let i = 0; i < pp.length; i++) {
+                if (box_intersect(c_text_xy(selected_card, i, pp.length), cursor_box)) {
+                    hovering_prop = i
+                }
+            }
         }
     }
 
@@ -60,6 +154,23 @@ function _update(dt: number) {
     }
 
     cursor_bg_speed_lerping = appr(cursor_bg_speed_lerping, cursor_bg_speed, 0.001)
+    if (i++ % 100 === 0) {
+        //console.log(cursor_bg_speed_lerping)
+    }
+
+    for (let c of cc.cards) {
+        update_card(c, dt)
+
+    }
+}
+let i = 0
+
+function update_card(c: Card, _dt: number) {
+    if (selected_card === c) {
+        if (selected_prop) {
+
+        }
+    }
 }
 
 function _render() {
@@ -74,14 +185,122 @@ function _render() {
 
 
     round_bg(cursor_box[0] + 45 + float_x, cursor_box[1] + 45 + float_y, cursor_down === undefined ? 70 : 67, cursor_down === undefined ? colors.white: colors.yellow, cursor_bg_speed_lerping)
-    if (i++ % 100 === 0) {
-        console.log(cursor_bg_speed_lerping)
-    }
     cursor(cursor_box[0], cursor_box[1])
 }
-let i = 0
 
 function render_gameplay2() {
+    for (let c of cc.cards) {
+        render_card(c)
+    }
+
+    render_my_turn()
+}
+
+function render_my_turn() {
+
+    let a = Math.sin(t * 0.002) * 8
+    text(`[${colors.yellow}]Select a[/] [${colors.white}]piece action[/] [${colors.yellow}]to play[/]`, 112 + a, 800, 110, { gap: 12, outline: 20, wave: 2 })
+    text(`Your Turn`, 512 - a, 1000, 140, { gap: 12, outline: 20, wave: 1 })
+
+}
+
+function card_box(c: Card): XYWH {
+    return [c.pos[0], c.pos[1], 280, 280]
+}
+
+
+function render_card(c: Card) {
+
+    let is_selected = selected_card === c
+
+    let color = c.c === white ? colors.white : colors.black
+    let [x, y] = c.pos
+    x += 100
+    y += 100
+
+    if (is_selected) {
+        round_bg(x + 30, y + 100, 230, role_to_color[c.r])
+    }
+
+    let _x = x + Math.sin(t * 0.002 - c.r * 0.4 + c.c * Math.PI * 1) * 8
+    let _y = y +Math.cos(t * 0.002 - c.r * 0.2 + c.c * Math.PI * 1) * 8
+    piece(role_to_path[c.r], _x, _y, 180, { color: color })
+
+
+    let prop_change = prop_changes.find(_ => _[0] === c)
+
+    if (prop_change) {
+        let color = t_prop_change % 350 < 200 ? colors.white : colors.purple
+        text(`[${color}]${prop_string(prop_change[1])!}[/]`, x, y, 50, { shadow: 4 })
+    } else {
+        text(prop_string(c.p)!, x, y, 50, { shadow: 4 })
+    }
+
+    //cx.fillRect(...card_box(c))
+
+    if (is_selected) {
+
+
+        circ_mask(x + 100, y - 300, 200, colors.black)
+
+        y -= 60
+
+
+        circ(x + 100, y - 200, 205, colors.black)
+        circ(x + 100, y - 200, 200, colors.purple)
+
+        text(`[${colors.green}]select[/] an action`, x - 55, y - 380, 42, { gap: 4, outline: 8, wave: 3})
+        let cc = card_choices(c)
+
+        if (cc === undefined || cc.length === 0) {
+            c_text('no action available', x + 102, y - 200, 40, false)
+        } else {
+            let tt = cc.map(_ => prop_string(_))
+
+            for (let i = 0; i < tt.length; i++) {
+                cx.save()
+                if (selected_prop === i) {
+                    if (t_select > 0) {
+                        let s = Math.max(1, 1 + 0.02 * t_select / 200)
+                        cx.scale(s, s)
+                    }
+                }
+                let [a, b, w, h] = c_text_xy(c, i, tt.length)
+                rect(a, b, w, h, colors.black)
+                rect(a + 4, b + 4, w - 8, h - 8, hovering_prop === i ? colors.green : colors.pink)
+                c_text(tt[i]!, a + 180, b + 60, 40, hovering_prop === i)
+                cx.restore()
+            }
+        }
+    }
+}
+
+function c_text_xy(c: Card, i: number, l: number): XYWH {
+    let [x, y] = c.pos
+    x += 100
+    y += 100
+
+    y -= 60
+
+    return [x + 90 - 180, y - 60 - (l <= 2 ? 250 : 290) + i * (l >= 3 ? 100 : 120), 380, 90]
+}
+
+function c_text(text: string, x: number, y: number, px: number, hi: boolean) {
+
+
+    cx.textAlign = 'center'
+    cx.font = `${px}px arial`
+
+    cx.strokeStyle = hi ? colors.white : colors.black
+    cx.lineWidth = 5
+    cx.font = `${px}px arial`
+    cx.strokeText(text, x, y)
+
+
+
+    cx.fillStyle = hi ? colors.black : colors.white
+    cx.fillText(text, x, y)
+
 
 }
 
@@ -96,7 +315,22 @@ function rect(x: number, y: number, w: number, h: number, color: Color) {
     cx.fillRect(x, y, w, h)
 }
 
-// @ts-ignore
+
+
+function circ_mask(x: number, y: number, radius: number, color?: Color) {
+    cx.save()
+    cx.beginPath()
+    cx.ellipse(x, y, radius * 2, radius, 0, 0, PI2)
+    cx.clip()
+
+    cx.globalCompositeOperation = 'source-in'
+    cx.fillStyle = color ?? colors.brown
+    cx.fillRect(0, 0, w, h)
+    cx.restore()
+    cx.globalCompositeOperation = 'source-over'
+}
+
+
 function circ(x: number, y: number, radius: number, color?: Color) {
     cx.fillStyle = color ?? colors.black
     cx.beginPath()
@@ -290,7 +524,7 @@ function paw(x: number, y: number, size: number = 280, opts: PieceOptions = {}) 
         cx.rotate(opts.theta)
         cx.translate(-off_s, -off_s)
     }
-    cx.fillStyle = colors.black
+    cx.fillStyle = opts.color ?? colors.black
     cx.fill(paths.paw)
 
     cx.beginPath()
@@ -447,6 +681,27 @@ const colors = {
     sand: '#FFCCAA',
 }
 
+const role_to_path = {
+    [bishop]: paths.bishop,
+    [queen]: paths.queen,
+    [rook]: paths.rook,
+    [knight]: paths.knight,
+    [king]: paths.king,
+    [pawn]: paths.pawn,
+}
+
+
+const role_to_color = {
+    [bishop]: colors.blue,
+    [queen]: colors.yellow,
+    [rook]: colors.brown,
+    [knight]: colors.orange,
+    [king]: colors.red,
+    [pawn]: colors.lightgray,
+}
+
+
+
 
 type TextOptions = {
     wave?: number
@@ -458,6 +713,7 @@ type TextOptions = {
 
 function text(text: string, x: number, y: number, px: number, opts: TextOptions = {}) {
 
+    cx.textAlign = 'left'
     let bold = opts.bold ? 'bold ' : ''
     const a = (i: number) => Math.sin(t * 0.01 + i * Math.PI * 2 * 0.2 * text.length / 50) * (opts.wave ?? 0)
     cx.font = `${bold}${px}px arial`
@@ -550,3 +806,4 @@ function app(el: HTMLElement) {
 
 
 app(document.getElementById('app')!)
+
