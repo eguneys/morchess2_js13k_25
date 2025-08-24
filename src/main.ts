@@ -1,16 +1,11 @@
 import { Loop, TouchMouse } from './loop_input';
 import './style.css'
 import { lerp, type XY, type XYWH } from './util';
-import {PP} from './choices'
 import { play, sounds } from './play_sounds'
 import { hey } from './chess_logic'
 
 hey()
-if (false) {
-    play(sounds.next)
-}
 
-console.log(PP)
 const w = 1920
 const h = 1080
 const hw = w / 2
@@ -33,7 +28,7 @@ function _init() {
 
     t = 0
 
-    is_intro = true
+    is_intro = false
 
     cursor_box0 = [hw, hh]
     cursor_box = [hw, hh, 16, 16]
@@ -137,6 +132,7 @@ function _update(dt: number) {
         cursor_bg_speed = 1
     }
     if (cursor_up) {
+        play(sounds.click)
 
         if (is_intro) {
             is_intro = false
