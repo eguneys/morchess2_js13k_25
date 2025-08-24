@@ -393,3 +393,8 @@ export const tt_arabian_mate: Tactic[] = [
     [[p_rooks_lift, p_knight_eye_king], [], [], [], 1],
     [[p_rooks_on_the_7th, p_knight_eye_king], [], [], [], 1],
 ]
+
+export const tt_backrank_mate: Tactic[] = [
+    [[p_rooks_on_open_file], [-p_rooks_home], [], [], 1],
+    [[p_rooks_doubled], [], [], [], 1],
+]

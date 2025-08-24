@@ -3,7 +3,9 @@ import './style.css'
 import { lerp, type XY, type XYWH } from './util';
 import {PP} from './choices'
 import { play, sounds } from './play_sounds'
+import { hey } from './chess_logic'
 
+hey()
 if (false) {
     play(sounds.next)
 }
@@ -31,7 +33,7 @@ function _init() {
 
     t = 0
 
-    is_intro = false
+    is_intro = true
 
     cursor_box0 = [hw, hh]
     cursor_box = [hw, hh, 16, 16]
@@ -309,6 +311,7 @@ function render_intro() {
     cx.fillStyle = colors.gray
     cx.fillRect(0, 0, 1920, 1080)
 
+    cat_walk(600, 0, 180, PI * 0.25)
 
 
     let float_theta = Math.sin(t * 0.001) * 0.1
@@ -423,7 +426,91 @@ function cursor(x: number, y: number, size: number = 80) {
     cx.restore()
 }
 
+let pawn_randoms: number[] = []
+for (let i = 0; i < 6; i++) {
+    pawn_randoms.push(Math.random())
+}
+
+function cat_walk(x: number, y: number, size: number = 280, theta = 0) {
+    cx.save()
+    cx.translate(x, y)
+    cx.rotate(theta)
+    let at = t % 6000 / 6000 * 48
+    for (let i = 0; i < 6; i++) {
+        if (at < i * 2) {
+            continue
+        }
+        paw(0 - 160 - pawn_randoms[i] * 80, 200 - (i - 2) * 180 + pawn_randoms[i] * 80, size)
+
+        if (at - 1 < i * 2) {
+            continue
+        }
+        paw(0 + pawn_randoms[i] * 80, 200 - ((i - 2) - 0.5) * 180, size)
+    }
+    cx.restore()
+}
+
+function paw(x: number, y: number, size: number = 280, opts: PieceOptions = {}) {
+    let scale = size / 512
+
+    cx.save()
+    cx.translate(x, y)
+    cx.scale(scale, scale)
+    if (opts.theta) {
+        let off_s = size / 1.6
+        cx.translate(off_s, off_s)
+        cx.rotate(opts.theta)
+        cx.translate(-off_s, -off_s)
+    }
+    cx.fillStyle = colors.black
+    cx.fill(paths.paw)
+
+    cx.beginPath()
+    cx.ellipse(158, 250, 34, 26, PI * 0.3, 0, PI2)
+    cx.fill()
+    cx.beginPath()
+    cx.ellipse(216, 190, 38, 29, PI * 0.43, 0, PI2)
+    cx.fill()
+    cx.beginPath()
+    cx.ellipse(296, 190, 38, 29, -PI * 0.43, 0, PI2)
+    cx.fill()
+    cx.beginPath()
+    cx.ellipse(358, 240, 34, 26, -PI * 0.3, 0, PI2)
+    cx.fill()
+
+
+    cx.fill()
+
+
+    cx.strokeStyle = 'white'
+    cx.lineWidth = 9
+    cx.stroke(paths.paw)
+
+    cx.beginPath()
+    cx.ellipse(158, 250, 34, 26, PI * 0.3, 0, PI2)
+    cx.stroke()
+    cx.beginPath()
+    cx.ellipse(216, 190, 38, 29, PI * 0.43, 0, PI2)
+    cx.stroke()
+    cx.beginPath()
+    cx.ellipse(296, 190, 38, 29, -PI * 0.43, 0, PI2)
+    cx.stroke()
+    cx.beginPath()
+    cx.ellipse(358, 240, 34, 26, -PI * 0.3, 0, PI2)
+    cx.stroke()
+
+
+    cx.restore()
+}
+
 let paths = {
+    paw: new Path2D(`M 324.5,282.26
+c -11.49-19.8-36.22-33.5-64.9-33.5
+s -53.41,13.7-64.9,33.5
+c -20.53,9.58-33.5,23.62-33.5,39.28,0,28.87,44.05,52.27,98.4,52.27
+s 98.4-23.4,98.4-52.27
+c 0-15.66-12.97-29.7-33.5-39.28
+Z`),
     cursor: new Path2D(`m 150.036,266.494
 c -0.264,0 -0.517,-0.006 -0.792,-0.018 -6.102,-0.337 -11.332,-4.474 -13.046,-10.347
 L 110.131,167.102 14.928,148.235
