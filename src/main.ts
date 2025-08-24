@@ -18,14 +18,19 @@ export function ai_play(cc: Cards) {
 
     let bb = cc.cards.filter(_ => _.c === black)
 
-    let card = arr_shuffle(bb)[0]
-    let ccc = card_choices(card)
+    for (let i = 0; i < 3; i++) {
+        let card = arr_shuffle(bb)[0]
+        let ccc = card_choices(card)
 
-    if (ccc === undefined || ccc.length === 0) {
-
-    } else {
-        prop_changes.push([card, arr_shuffle(ccc)[0]])
-        t_prop_change = 1000
+        if (ccc === undefined || ccc.length === 0) {
+            if (i === 2) {
+                t_prop_change = 1000
+            }
+        } else {
+            prop_changes.push([card, arr_shuffle(ccc)[0]])
+            t_prop_change = 1000
+            break
+        }
     }
 
 }
@@ -57,10 +62,15 @@ type PropChange = [Card, Property]
 let prop_changes: PropChange[]
 let t_prop_change: number
 
+let t_ai_think_all: number
 let t_ai_think: number
 let t_begin: number
 
+let cat_walks: XYWH[]
+
 function _init() {
+
+    cat_walks = []
 
     t_begin = 0
     t_ai_think = 0
@@ -163,7 +173,7 @@ function _update(dt: number) {
     }
 
     for (let c of cc.cards) {
-        if (t_begin < 5000 || cc.turn === black || c.c === black) {
+        if (t_prop_change > 0 || t_begin <= 5000 || cc.turn === black || c.c === black) {
             continue
         }
         if (box_intersect(card_box(c), cursor_box)) {
@@ -204,6 +214,16 @@ function _update(dt: number) {
         update_card(c, dt)
 
     }
+
+
+    if (cc.turn === white) {
+        if (Math.random() < 0.3) {
+            if (cat_walks.length > 8) {
+                cat_walks.pop()
+            }
+            cat_walks.unshift([-500 + Math.random() * 2800, -400 + Math.random() * 2000, 80 + Math.random() * 130, Math.random() * Math.PI])
+        }
+    }
 }
 let i = 0
 
@@ -213,6 +233,7 @@ function end_turn() {
 
     if (cc.turn === black) {
         t_ai_think = 1000 + Math.random() * 2000
+        t_ai_think_all = t_ai_think
     }
 }
 
@@ -241,6 +262,11 @@ function _render() {
 }
 
 function render_gameplay2() {
+
+    if (cc.turn === black) {
+        render_ai_cat_bg()
+    }
+
     for (let c of cc.cards) {
         render_card(c)
     }
@@ -251,6 +277,12 @@ function render_gameplay2() {
         render_my_turn()
     } else {
         render_ai_turn()
+    }
+}
+
+function render_ai_cat_bg() {
+    for (let i = 0; i < cat_walks.length; i++) {
+        cat_walk(...cat_walks[i], (1- t_ai_think / t_ai_think_all) * 2000, colors.pink)
     }
 }
 
@@ -271,8 +303,8 @@ function render_ai_turn() {
 function render_my_turn() {
 
     let a = Math.sin(t * 0.002) * 8
-    text(`[${colors.yellow}]Select a[/] [${colors.white}]piece action[/] [${colors.yellow}]to play[/]`, 112 + a, 800, 110, { gap: 12, outline: 20, wave: 2 })
-    text(`Your Turn`, 512 - a, 1000, 140, { gap: 12, outline: 20, wave: 1 })
+    text(`[${colors.yellow}]Select a[/] [${colors.white}]piece action[/] [${colors.yellow}]to play[/]`, 112 + a, 800, 110, { gap: 12, outline: 12, wave: 2 })
+    text(`Your Turn`, 512 - a, 1000, 140, { gap: 12, outline: 8, wave: 1 })
 
 }
 
@@ -565,21 +597,21 @@ for (let i = 0; i < 6; i++) {
     pawn_randoms.push(Math.random())
 }
 
-function cat_walk(x: number, y: number, size: number = 280, theta = 0) {
+function cat_walk(x: number, y: number, size: number = 280, theta = 0, _t = t, color?: Color) {
     cx.save()
     cx.translate(x, y)
     cx.rotate(theta)
-    let at = t % 6000 / 6000 * 48
+    let at = _t % 6000 / 6000 * 48
     for (let i = 0; i < 6; i++) {
         if (at < i * 2) {
             continue
         }
-        paw(0 - 160 - pawn_randoms[i] * 80, 200 - (i - 2) * 180 + pawn_randoms[i] * 80, size)
+        paw(0 - 160 - pawn_randoms[i] * 80, 200 - (i - 2) * 180 + pawn_randoms[i] * 80, size, {color})
 
         if (at - 1 < i * 2) {
             continue
         }
-        paw(0 + pawn_randoms[i] * 80, 200 - ((i - 2) - 0.5) * 180, size)
+        paw(0 + pawn_randoms[i] * 80, 200 - ((i - 2) - 0.5) * 180, size, { color })
     }
     cx.restore()
 }
