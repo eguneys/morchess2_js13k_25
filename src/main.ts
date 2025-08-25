@@ -6,6 +6,7 @@ import { card_choices as _card_choices, cards, prop_string, type Card, type Card
 import { bishop, black, king, knight, pawn, queen, rook, white, type Property } from './choices';
 import { arr_shuffle } from './random';
 
+
 const card_choices = (c: Card) => {
     if (!c.choices) {
         c.choices = _card_choices(c, cc.cards.filter(a => a.c === c.c))
@@ -113,7 +114,7 @@ function _init() {
 
     t = 0
 
-    is_intro = false
+    is_intro = true
 
     cursor_box0 = [hw, hh]
     cursor_box = [hw, hh, 80, 40]
@@ -130,6 +131,8 @@ function _update(dt: number) {
         t_tactics -= dt
 
         if (t_tactics <= 0) {
+
+            play(sounds.no_tactics)
             t_tactics_result = 2000
             a_tactics_sound()
             a_tactics_sound = () => {}
@@ -188,7 +191,7 @@ function _update(dt: number) {
         }
     }
 
-    is_tactics_hover = box_intersect(tactics_box, cursor_box)
+    is_tactics_hover = !is_intro && box_intersect(tactics_box, cursor_box)
 
     if (cursor_down) {
         cursor_bg_speed = 0.3
@@ -200,6 +203,7 @@ function _update(dt: number) {
 
         if (is_intro) {
             is_intro = false
+            return
         }
 
         if (selected_card !== undefined) {
@@ -225,6 +229,9 @@ function _update(dt: number) {
             search_tactics()
         }
 
+    }
+    if (is_intro) {
+        return
     }
 
     let found = selected_card ? box_intersect(card_box2(selected_card), cursor_box) : false
@@ -1024,6 +1031,8 @@ async function app(el: HTMLElement) {
     el.appendChild($)
 
     sounds = await make_sounds()
+
+    //play(sounds.no_tactics)
 
     _init()
 
