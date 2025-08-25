@@ -36,6 +36,7 @@ export function card_choices(card: Card, cc: Card[]) {
 
                 if (p < 0) {
                     let exists = cc.find(c => c.p === -p)
+                    console.log(exists)
                     if (exists) {
                         return false
                     }

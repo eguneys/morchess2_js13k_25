@@ -118,7 +118,9 @@ function _update(dt: number) {
 
             prop_changes.forEach(c => {
                 c[0].p = c[1]
-                c[0].choices = undefined
+            })
+            cc.cards.forEach(c => {
+                c.choices = undefined
             })
 
             prop_changes = []
@@ -648,7 +650,7 @@ function paw(x: number, y: number, size: number = 280, opts: PieceOptions = {}) 
     cx.fill()
 
 
-    cx.strokeStyle = 'white'
+    cx.strokeStyle = opts.color === colors.black ? colors.white : colors.black
     cx.lineWidth = 9
     cx.stroke(paths.paw)
 
