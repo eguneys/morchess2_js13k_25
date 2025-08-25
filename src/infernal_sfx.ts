@@ -30,4 +30,8 @@ export function play(audioBuffer: AudioBuffer) {
     source.buffer = audioBuffer;
     source.connect(cx.destination);
     source.start();
+
+    return () => {
+        source.stop()
+    }
 };

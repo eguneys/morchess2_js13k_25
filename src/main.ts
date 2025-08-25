@@ -1,7 +1,7 @@
 import { Loop, TouchMouse } from './loop_input';
 import './style.css'
 import { appr, box_intersect, type XY, type XYWH } from './util';
-import { play, sounds } from './play_sounds'
+import { play, make_sounds, type Sounds } from './play_sounds'
 import { card_choices as _card_choices, cards, prop_string, type Card, type Cards } from './chess_logic'
 import { bishop, black, king, knight, pawn, queen, rook, white, type Property } from './choices';
 import { arr_shuffle } from './random';
@@ -22,9 +22,19 @@ export function ai_play(cc: Cards) {
         let card = arr_shuffle(bb)[0]
         let ccc = card_choices(card)
 
+        if (i === 0 && Math.random() < 0.08) {
+            search_tactics(3 + Math.random() * 4000)
+            return
+        }
+        if (i > 0 && Math.random() < 0.8) {
+            search_tactics(3 + Math.random() * 12000)
+            return
+        }
         if (ccc === undefined || ccc.length === 0) {
             if (i === 2) {
                 t_prop_change = 1000
+                search_tactics(3 + Math.random() * 12000)
+                return
             }
         } else {
             prop_changes.push([card, arr_shuffle(ccc)[0]])
@@ -68,11 +78,28 @@ let t_begin: number
 
 let cat_walks: XYWH[]
 
+let is_tactics_hover: boolean
+
+let t_s_cool: number
+
+let t_tactics: number
+let t_tactics_result: number
+
 function _init() {
 
+    a_tactics_sound = () => {}
+    t_tactics = 0
+    t_tactics_result = 0
+
+    is_tactics_hover = false
     cat_walks = []
 
+    t_s_cool = 0
+
     t_begin = 0
+
+    t_begin = 6000
+
     t_ai_think = 0
 
     prop_changes = []
@@ -89,7 +116,7 @@ function _init() {
     is_intro = false
 
     cursor_box0 = [hw, hh]
-    cursor_box = [hw, hh, 16, 16]
+    cursor_box = [hw, hh, 80, 40]
     cursor_down = undefined
     cursor_up = undefined
     cursor_bg_speed = 1
@@ -99,7 +126,28 @@ function _init() {
 
 function _update(dt: number) {
 
+    if (t_tactics > 0) {
+        t_tactics -= dt
+
+        if (t_tactics <= 0) {
+            t_tactics_result = 2000
+            a_tactics_sound()
+            a_tactics_sound = () => {}
+        }
+    }
+    if (t_tactics_result > 0) {
+
+        t_tactics_result -= dt
+        if (t_tactics_result <= 0) {
+            if (cc.turn === black) {
+                ai_play(cc)
+            }
+        }
+    }
+
     t += dt
+
+    t_s_cool -= dt
 
     if (t_select > 0) {
         t_select -= dt
@@ -140,6 +188,7 @@ function _update(dt: number) {
         }
     }
 
+    is_tactics_hover = box_intersect(tactics_box, cursor_box)
 
     if (cursor_down) {
         cursor_bg_speed = 0.3
@@ -171,19 +220,35 @@ function _update(dt: number) {
             }
         }
 
+        if (is_tactics_hover) {
+            play(sounds.click)
+            search_tactics()
+        }
 
     }
 
+    let found = selected_card ? box_intersect(card_box2(selected_card), cursor_box) : false
     for (let c of cc.cards) {
-        if (t_prop_change > 0 || t_begin <= 5000 || cc.turn === black || c.c === black) {
+        if (t_tactics_result > 0 || t_tactics > 0 || t_s_cool > 0 || t_prop_change > 0 || t_begin <= 5000 || cc.turn === black) {
+            found = true
+            continue
+        } 
+        if(c.c === black) {
             continue
         }
+
         if (box_intersect(card_box(c), cursor_box)) {
             if (selected_card !== c) {
                 play(sounds.ring)
             }
             selected_card = c
+            t_s_cool = 100
+            found = true
         }
+    }
+    if (!found) {
+        selected_card = undefined
+        selected_prop = -1
     }
 
 
@@ -229,6 +294,21 @@ function _update(dt: number) {
 }
 let i = 0
 
+let a_tactics_sound: () => void
+function search_tactics(n: number = 15000) {
+    if (t_tactics > 0) {
+
+        t_tactics = 0
+        t_tactics_result = 2000
+        a_tactics_sound()
+        a_tactics_sound = () => { }
+        return
+    }
+    selected_card = undefined
+    selected_prop = -1
+    t_tactics = n
+    a_tactics_sound = play(sounds.tactic)
+}
 
 function end_turn() {
     cc.turn = cc.turn === black ? white : black
@@ -270,16 +350,53 @@ function render_gameplay2() {
     }
 
     for (let c of cc.cards) {
-        render_card(c)
+        render_card(c, t_tactics > 0)
     }
 
     if (t_begin < 5000) {
         render_begin()
+    } else if (t_tactics_result > 0) {
+        render_tactics_result()
+    } else if (t_tactics > 0) {
+        render_tactics()
     } else if (cc.turn === white) {
         render_my_turn()
     } else {
         render_ai_turn()
     }
+}
+
+function render_tactics_result() {
+
+    text(`No tactics found :|`, 500, 880, 110, { outline: 8, wave: 1 })
+}
+
+function render_tactics() {
+    if (cc.turn === black) {
+        render_cat_tactics()
+    } else {
+        render_my_tactics()
+    }
+}
+
+function render_cat_tactics() {
+    let dots = t % 1000 < 200 ? '.  ' : t % 1000 < 500 ? '.. ' :'...'
+    text(`[${colors.black}]Cat[/] is searching for [${colors.purple}]tactics[/]${dots}`, 240, 800, 110, { outline: 8, wave: 8 })
+}
+
+function render_my_tactics() {
+
+    let dots = t % 1000 < 200 ? '.  ' : t % 1000 < 500 ? '.. ' :'...'
+    text(`[${colors.yellow}]Hold on[/] Searching for [${colors.purple}]tactics[/]${dots}`, 240, 800, 110, { outline: 8, wave: 8 })
+    text(`More time higher [${colors.orange}]chances[/], but watch your [${colors.yellow}]time`, 100, 900, 80, { outline: 6, wave: 1 })
+    text(`don't get [${colors.red}]flagged`, 100, 1000, 60, { outline: 6, wave: 2 })
+
+
+    rect(1330 - 8, 940 - 8, 544 + 16, 120 + 16, colors.black)
+    rect(1330, 940, 544, 120, is_tactics_hover ? colors.green: colors.pink)
+
+    text(`[${is_tactics_hover?colors.black:colors.white}]Stop Search[/]`, 1400, 1026, 70, { gap: 2, outline: 6 })
+
 }
 
 function render_ai_cat_bg() {
@@ -308,14 +425,29 @@ function render_my_turn() {
     text(`[${colors.yellow}]Select a[/] [${colors.white}]piece action[/] [${colors.yellow}]to play[/]`, 112 + a, 800, 110, { gap: 12, outline: 12, wave: 2 })
     text(`Your Turn`, 512 - a, 1000, 140, { gap: 12, outline: 8, wave: 1 })
 
+    text(`or`, 1550, 910, 80, { outline: 8 })
+
+
+    rect(1330 - 8, 940 - 8, 544 + 16, 120 + 16, colors.black)
+    rect(1330, 940, 544, 120, is_tactics_hover ? colors.green: colors.pink)
+
+    text(`[${is_tactics_hover?colors.black:colors.white}]Search[/] [${colors.purple}]Tactics`, 1360, 1026, 70, { gap: 2, outline: 6 })
+    //cx.fillRect(...card_box2(cc.cards[8]))
 }
+
+const tactics_box: XYWH = [1330 - 8, 940 - 8, 544, 120]
 
 function card_box(c: Card): XYWH {
     return [c.pos[0], c.pos[1], 280, 280]
 }
 
+function card_box2(c: Card): XYWH {
+    return [c.pos[0] - 20, c.pos[1] - 360, 420, 480]
+}
 
-function render_card(c: Card) {
+
+
+function render_card(c: Card, speed?: boolean) {
 
     let is_selected = selected_card === c
 
@@ -328,8 +460,9 @@ function render_card(c: Card) {
         round_bg(x + 30, y + 100, 230, role_to_color[c.r])
     }
 
-    let _x = x + Math.sin(t * 0.002 - c.r * 0.4 + c.c * Math.PI * 1) * 8
-    let _y = y +Math.cos(t * 0.002 - c.r * 0.2 + c.c * Math.PI * 1) * 8
+    let f2 = speed ? 4 : 1
+    let _x = x + Math.sin(t * 0.002 * f2 - c.r * 0.4 + c.c * Math.PI * 1) * 8
+    let _y = y +Math.cos(t * 0.002 * f2 - c.r * 0.2 + c.c * Math.PI * 1) * 8
     piece(role_to_path[c.r], _x, _y, 180, { color: color })
 
 
@@ -517,7 +650,7 @@ function round_bg(x: number, y: number, radius: number, color: Color, speed = 1)
     cx.fillStyle = color
     let grid_spacing = radius * 0.2
 
-    let a = (t * 0.02 * speed) % grid_spacing
+    let a = (t % 10000 * 0.02 * speed) % grid_spacing
     for (let i = -100; i < 200; i++) {
         for (let j = -100; j < 200; j++) {
             let _x = i * grid_spacing
@@ -880,13 +1013,17 @@ function init_canvas() {
     return canvas
 }
 
-function app(el: HTMLElement) {
+let sounds: Sounds
+
+async function app(el: HTMLElement) {
 
     let canvas = init_canvas()
     let $ = document.createElement('content')
     $.classList.add('content')
     $.appendChild(canvas)
     el.appendChild($)
+
+    sounds = await make_sounds()
 
     _init()
 
