@@ -24,17 +24,17 @@ export function ai_play(cc: Cards) {
         let ccc = card_choices(card)
 
         if (i === 0 && Math.random() < 0.08) {
-            search_tactics(3 + Math.random() * 4000)
+            search_tactics(3000 + Math.random() * 4000)
             return
         }
         if (i > 0 && Math.random() < 0.8) {
-            search_tactics(3 + Math.random() * 12000)
+            search_tactics(3000 + Math.random() * 12000)
             return
         }
         if (ccc === undefined || ccc.length === 0) {
             if (i === 2) {
                 t_prop_change = 1000
-                search_tactics(3 + Math.random() * 12000)
+                search_tactics(3000 + Math.random() * 12000)
                 return
             }
         } else {
@@ -344,6 +344,9 @@ function update_card(c: Card, _dt: number) {
 
 function _render() {
     cx.clearRect(0, 0, 1920, 1080)
+
+
+
     if (is_intro) {
         render_intro()
     } else {
@@ -355,6 +358,90 @@ function _render() {
 
     round_bg(cursor_box[0] + 45 + float_x, cursor_box[1] + 45 + float_y, cursor_down === undefined ? 70 : 67, cursor_down === undefined ? colors.white: colors.yellow, cursor_bg_speed_lerping)
     cursor(cursor_box[0], cursor_box[1])
+}
+
+function render_board_bg2(color: Color, color2: Color) {
+    cx.fillStyle = color
+    cx.fillRect(0, 0, 1920, 1080)
+
+    cx.fillStyle = color2
+    cx.fillRect(0, 0, 1000, 1000)
+    cx.fillRect(1000, 10, 200, 200)
+    cx.fillRect(880, 450, 200, 200)
+    cx.fillRect(940, 850, 200, 200)
+    cx.fillRect(1280, 50, 200, 200)
+    cx.fillRect(1100, 270, 200, 200)
+    cx.fillRect(1180, 720, 200, 200)
+
+    cx.fillRect(1580, 320, 200, 200)
+    cx.fillRect(1400, 550, 200, 200)
+    cx.fillRect(1600, 850, 200, 200)
+
+
+    cx.fillStyle = color
+    cx.fillRect(50, 0, 200, 200)
+    cx.fillRect(450, 0, 200, 200)
+    cx.fillRect(850, 0, 200, 200)
+
+    cx.fillRect(-150, 200, 200, 200)
+    cx.fillRect(250, 200, 200, 200)
+    cx.fillRect(650, 200, 200, 200)
+
+    cx.fillRect(50, 400, 200, 200)
+    cx.fillRect(450, 400, 200, 200)
+    cx.fillRect(850, 400, 200, 200)
+
+    cx.fillRect(-150, 600, 200, 200)
+    cx.fillRect(250, 600, 200, 200)
+    cx.fillRect(650, 600, 200, 200)
+
+    cx.fillRect(50, 800, 200, 200)
+    cx.fillRect(450, 800, 200, 200)
+    cx.fillRect(850, 800, 200, 200)
+}
+
+// @ts-ignore
+function render_board_bg(color: Color, color2: Color) {
+    cx.save()
+    cx.beginPath()
+    cx.rect(1200, 0, 1000, 400)
+    cx.closePath()
+    cx.clip()
+
+
+
+    let radius = 1200
+    cx.fillStyle = color
+    let grid_spacing = radius * 0.08
+    cx.fillRect(0, 0, 1920, 1080)
+    cx.fillStyle = color2
+
+    let a = (t * 0.06) % (grid_spacing * 100)
+    for (let i = -100; i < 100; i+= 3) {
+        for (let j = -100; j < 100; j+=2) {
+            let _x = i * grid_spacing
+            let _y = j * grid_spacing
+
+            _x += a * 16/ 9
+            _y -= a
+
+            let dist_from_center = Math.sqrt((_x - 1280) ** 2 + (_y - 100) ** 2)
+            let normalized_dist = dist_from_center / radius
+            let _radius = grid_spacing * 0.1 * Math.pow(1 -normalized_dist, 0.7)
+
+            _radius = Math.max(1, _radius * 4)
+
+            //_x += 5000 / i
+ 
+            if (_radius === 1) {
+                continue
+            }
+            _radius *= 5
+
+            cx.fillRect(_x - _radius /2 , _y - _radius / 2, _radius, _radius)
+        }
+    }
+    cx.restore()
 }
 
 function render_gameplay2() {
@@ -634,6 +721,8 @@ function render_intro() {
     cx.fillStyle = colors.gray
     cx.fillRect(0, 0, 1920, 1080)
 
+    render_board_bg2(colors.lightgray, colors.gray)
+
     cat_walk(600, 0, 180, PI * 0.25)
 
 
@@ -653,7 +742,7 @@ function render_intro() {
 
 
     text(`~[${colors.purple}]Mor[/] Chess [${colors.red}]2[/]~`, 380, 300, 180, { bold: true, gap: -4, outline: 18, wave: 8 })
-    text(`An [${colors.darkred}]Abstract[/], [${colors.gray}]shapeless[/] Form of Chess`, 260, 400, 80, { bold: true, shadow: 4, wave: 4 })
+    text(`An [${colors.darkred}]Abstract[/], [${colors.lightgray}]shapeless[/] Form of Chess`, 260, 400, 80, { bold: true, shadow: 4, wave: 4 })
 
     text(`by [${colors.blue}]eguneys`, 100, 800, 60, { shadow: 2, wave: 2 })
 
