@@ -86,11 +86,14 @@ let t_s_cool: number
 let t_tactics: number
 let t_tactics_result: number
 
+let t_tactics_hint: number
+
 function _init() {
 
     a_tactics_sound = () => {}
     t_tactics = 0
     t_tactics_result = 0
+    t_tactics_hint = 0
 
     is_tactics_hover = false
     cat_walks = []
@@ -191,7 +194,7 @@ function _update(dt: number) {
         }
     }
 
-    is_tactics_hover = !is_intro && box_intersect(tactics_box, cursor_box)
+    is_tactics_hover = t_tactics_result <= 0 && t_begin > 5000 && !is_intro && box_intersect(tactics_box, cursor_box)
 
     if (cursor_down) {
         cursor_bg_speed = 0.3
@@ -202,7 +205,9 @@ function _update(dt: number) {
     if (cursor_up) {
 
         if (is_intro) {
+            play(sounds.click)
             is_intro = false
+            t_begin = 0
             return
         }
 
@@ -303,12 +308,14 @@ let i = 0
 
 let a_tactics_sound: () => void
 function search_tactics(n: number = 15000) {
+    t_tactics_hint+= 1
     if (t_tactics > 0) {
 
         t_tactics = 0
         t_tactics_result = 2000
         a_tactics_sound()
         a_tactics_sound = () => { }
+        play(sounds.no_tactics)
         return
     }
     selected_card = undefined
@@ -376,6 +383,7 @@ function render_gameplay2() {
 function render_tactics_result() {
 
     text(`No tactics found :|`, 500, 880, 110, { outline: 8, wave: 1 })
+    text(`In Chess, 80% of the tactics don't work!`, 300, 980, 60, { shadow: 3 })
 }
 
 function render_tactics() {
@@ -395,7 +403,14 @@ function render_my_tactics() {
 
     let dots = t % 1000 < 200 ? '.  ' : t % 1000 < 500 ? '.. ' :'...'
     text(`[${colors.yellow}]Hold on[/] Searching for [${colors.purple}]tactics[/]${dots}`, 240, 800, 110, { outline: 8, wave: 8 })
-    text(`More time higher [${colors.orange}]chances[/], but watch your [${colors.yellow}]time`, 100, 900, 80, { outline: 6, wave: 1 })
+    if (t_tactics_hint % 3 === 0) {
+        text(`More [${colors.yellow}]time[/], higher [${colors.orange}]chances[/], but watch your [${colors.yellow}]time`, 100, 900, 80, { outline: 6, wave: 1 })
+    } else if (t_tactics_hint % 3 === 1) {
+        text(`An [${colors.darkred}]exposed king[/] and [${colors.darkred}]pawn weaknesses[/], increases your [${colors.orange}]chances[/] to [${colors.sand}]fall for tactics[/].`, 60, 900, 50, { outline: 6, wave: 1 })
+    } else {
+        text(`[${colors.green}]Activating[/] your pieces increases your [${colors.orange}]chances[/] to [${colors.pink}]find good tactics[/].`, 100, 900, 60, { outline: 6, wave: 1 })
+    }
+
     text(`don't get [${colors.red}]flagged`, 100, 1000, 60, { outline: 6, wave: 2 })
 
 
@@ -657,7 +672,7 @@ function round_bg(x: number, y: number, radius: number, color: Color, speed = 1)
     cx.fillStyle = color
     let grid_spacing = radius * 0.2
 
-    let a = (t % 10000 * 0.02 * speed) % grid_spacing
+    let a = (t % (1000 * grid_spacing) * 0.02 * speed) % grid_spacing
     for (let i = -100; i < 200; i++) {
         for (let j = -100; j < 200; j++) {
             let _x = i * grid_spacing
@@ -943,7 +958,7 @@ const role_to_color = {
     [rook]: colors.brown,
     [knight]: colors.orange,
     [king]: colors.red,
-    [pawn]: colors.lightgray,
+    [pawn]: colors.sand,
 }
 
 

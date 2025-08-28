@@ -41,7 +41,7 @@ export async function make_sounds(): Promise<Sounds> {
     });
 
     let ring = await generate(.20, (i: number) => {
-        return sin(i / 44100 * 2 * Math.PI  * 133 * i % 10000 < 5000 ? 2 : saw((i % 600 < 100 ? 1 : 2.22) * i / 44100 * 2 * Math.PI * 15))
+        return sin(i / 44100 * 2 * Math.PI  * 133 * i % 10000 < 5000 ? 2 : saw((i % 600 < 100 ? 1 : 2.22) * i / 44100 * 2 * Math.PI * 15)) * 0.5
     });
 
     let click = await generate(.20, (i: number) => {
