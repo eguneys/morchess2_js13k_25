@@ -2,7 +2,7 @@ import { Loop, TouchMouse } from './loop_input';
 import './style.css'
 import { appr, box_intersect, type XY, type XYWH } from './util';
 import { play, make_sounds, type Sounds } from './play_sounds'
-import { card_choices as _card_choices, cards, prop_string, type Card, type Cards } from './chess_logic'
+import { card_choices as _card_choices, cards, prop_string, tactic_choices, tactic_string, type Card, type Cards } from './chess_logic'
 import { bishop, black, king, knight, pawn, queen, rook, white, type Property } from './choices';
 import { arr_shuffle } from './random';
 
@@ -83,14 +83,24 @@ let is_tactics_hover: boolean
 
 let t_s_cool: number
 
+let t_tactics_nb: number
 let t_tactics: number
 let t_tactics_result: number
 
 let t_tactics_hint: number
 
+let tactic_found: [Property, Property[], Property[]] | undefined
+let t_tactic_found: number
+let t_mate_found: number
+
 function _init() {
 
+    t_mate_found = 0
+    t_tactic_found = 0
+    tactic_found = undefined
+
     a_tactics_sound = () => {}
+    t_tactics_nb = 0
     t_tactics = 0
     t_tactics_result = 0
     t_tactics_hint = 0
@@ -130,6 +140,24 @@ function _init() {
 
 function _update(dt: number) {
 
+    if (t_mate_found > 0) {
+        t_mate_found -= dt
+
+        if (t_mate_found <= 0) {
+            tactic_found = undefined
+            end_game()
+        }
+    }
+
+    if (t_tactic_found > 0) {
+        t_tactic_found -= dt
+
+        if (t_tactic_found <= 0) {
+            tactic_found = undefined
+            end_turn()
+        }
+    }
+
     if (t_tactics > 0) {
         t_tactics -= dt
 
@@ -139,6 +167,10 @@ function _update(dt: number) {
             t_tactics_result = 2000
             a_tactics_sound()
             a_tactics_sound = () => {}
+        }
+
+        if (t_tactics < t_tactics_nb - 1600 && t_tactics % 200 < 20) {
+            try_choice_tactic()
         }
     }
     if (t_tactics_result > 0) {
@@ -194,7 +226,7 @@ function _update(dt: number) {
         }
     }
 
-    is_tactics_hover = t_tactics_result <= 0 && t_begin > 5000 && !is_intro && box_intersect(tactics_box, cursor_box)
+    is_tactics_hover = cc.turn === white && t_mate_found <= 0 && t_tactic_found <= 0 && t_tactics_result <= 0 && t_begin > 5000 && !is_intro && box_intersect(tactics_box, cursor_box)
 
     if (cursor_down) {
         cursor_bg_speed = 0.3
@@ -203,6 +235,10 @@ function _update(dt: number) {
         cursor_bg_speed = 0.6
     }
     if (cursor_up) {
+        if (t_mate_found > 0 && t_mate_found < 45000) {
+            end_game()
+            return
+        }
 
         if (is_intro) {
             play(sounds.click)
@@ -241,7 +277,7 @@ function _update(dt: number) {
 
     let found = selected_card ? box_intersect(card_box2(selected_card), cursor_box) : false
     for (let c of cc.cards) {
-        if (t_tactics_result > 0 || t_tactics > 0 || t_s_cool > 0 || t_prop_change > 0 || t_begin <= 5000 || cc.turn === black) {
+        if (t_mate_found > 0 || t_tactic_found > 0 || t_tactics_result > 0 || t_tactics > 0 || t_s_cool > 0 || t_prop_change > 0 || t_begin <= 5000 || cc.turn === black) {
             found = true
             continue
         } 
@@ -285,10 +321,6 @@ function _update(dt: number) {
     }
 
     cursor_bg_speed_lerping = appr(cursor_bg_speed_lerping, cursor_bg_speed, 0.001)
-    if (i++ % 100 === 0) {
-        //console.log(cursor_bg_speed_lerping)
-    }
-
     for (let c of cc.cards) {
         update_card(c, dt)
 
@@ -304,7 +336,30 @@ function _update(dt: number) {
         }
     }
 }
-let i = 0
+
+function try_choice_tactic() {
+    if (tactic_found !== undefined) {
+        return
+    }
+
+    tactic_found = tactic_choices(cc)
+
+    if (tactic_found) {
+        if (tactic_string(tactic_found[0])!.includes('ate')) {
+            t_mate_found = 50000
+        } else {
+            t_tactic_found = 5000
+        }
+        end_search_tactics()
+    }
+}
+
+function end_search_tactics() {
+    t_tactics = 0
+    a_tactics_sound()
+    a_tactics_sound = () => { }
+    //play(sounds.yes_tactics)
+}
 
 let a_tactics_sound: () => void
 function search_tactics(n: number = 15000) {
@@ -321,7 +376,12 @@ function search_tactics(n: number = 15000) {
     selected_card = undefined
     selected_prop = -1
     t_tactics = n
+    t_tactics_nb = n
     a_tactics_sound = play(sounds.tactic)
+}
+
+function end_game() {
+    _init()
 }
 
 function end_turn() {
@@ -459,6 +519,10 @@ function render_gameplay2() {
 
     if (t_begin < 5000) {
         render_begin()
+    } else if (t_mate_found > 0) {
+        render_mate_found()
+    } else if (t_tactic_found > 0) {
+        render_tactics_found()
     } else if (t_tactics_result > 0) {
         render_tactics_result()
     } else if (t_tactics > 0) {
@@ -468,6 +532,28 @@ function render_gameplay2() {
     } else {
         render_ai_turn()
     }
+}
+
+function render_mate_found() {
+    let tactic = tactic_string(tactic_found![0])!
+    let n = tactic[0] === 'A' ? 'n' :''
+    text(`A${n} [${colors.purple}]${tactic}[/] found!`, 200, 880, 110, { outline: 8, wave: 1 })
+
+    let cat = cc.turn === white ? 'Player': `[${colors.black}]Black Cat`
+    let a = Math.sin(t * 0.01) * 3
+    text(`Game Over`, 100, 500, 300, { gap: 20, outline: 30 + a, wave: 1 })
+    text(`${cat} [${colors.blue}]wins[/].`, 500, 700, 100, { gap: 20, outline: 10, wave: 1 })
+
+    if (t_mate_found < 45000) {
+        text(`[${colors.yellow}]Click[/] anywhere to [${colors.green}]restart[/].`, 100, 1000, 60, { shadow: 3, wave: 2 })
+    }
+}
+
+function render_tactics_found() {
+    let tactic = tactic_string(tactic_found![0])!
+    let n = tactic[0] === 'A' ? 'n' :''
+    text(`A${n} [${colors.purple}]${tactic}[/] found!`, 200, 880, 110, { outline: 8, wave: 1 })
+    text(`[${colors.yellow}]~[/] Going down that line now. [${colors.yellow}]~[/]`, 500, 980, 80, { outline: 8, wave: 8 })
 }
 
 function render_tactics_result() {

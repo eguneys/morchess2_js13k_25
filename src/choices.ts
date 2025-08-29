@@ -75,7 +75,7 @@ export const t_trap_piece = id++
 export const t_knight_fork = id++
 export const t_double_attack = id++
 export const t_skewer = id++
-export const t_discoved_check = id++
+export const t_discovered_check = id++
 export const t_backrank_mate = id++
 export const t_queen_checkmate = id++
 export const t_smothered_mate = id++
@@ -163,7 +163,7 @@ export const PP: Record<string, Property> = {
     t_knight_fork,
     t_double_attack,
     t_skewer,
-    t_discoved_check,
+    t_discovered_check,
     t_backrank_mate,
     t_queen_checkmate,
     t_smothered_mate,
@@ -412,4 +412,17 @@ export const tt_arabian_mate: Tactic[] = [
 export const tt_backrank_mate: Tactic[] = [
     [[p_rooks_on_open_file], [-p_rooks_home], [], [], 1],
     [[p_rooks_doubled], [], [], [], 1],
+]
+
+
+export const t_by_tactic_chances: [[Property, Tactic[]], number][] = [
+    [[-1, []], 1],
+    [[t_trap_piece, tt_trap_piece], 1],
+    [[t_knight_fork, tt_knight_fork], 1],
+    [[t_skewer, tt_skewer], 1],
+    [[t_discovered_check, tt_discovered_check], 1],
+    [[t_queen_checkmate, tt_queen_checkmate], 1],
+    [[t_smothered_mate, tt_smothered_mate], 1],
+    [[t_arabian_mate, tt_arabian_mate], 1],
+    [[t_backrank_mate, tt_backrank_mate], 1],
 ]

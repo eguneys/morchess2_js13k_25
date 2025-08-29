@@ -21,6 +21,54 @@ function card(r: c.Role, p: c.Property, color: c.Color): Card {
     return { c: color, r, p, pos }
 }
 
+export function tactic_choices(cc: Cards) {
+    let us = cc.cards.filter(_ => _.c === cc.turn)
+    let them = cc.cards.filter(_ => _.c !== cc.turn)
+
+    let [t, tt] = w_select(c.t_by_tactic_chances)
+
+    if (t === -1) {
+        return undefined
+    }
+
+    let tt2 = tt.filter(_ =>
+        _[0].every(p => us.find(_ => _.p === p)) &&
+        _[1].every(p => them.find(_ => _.p === p))
+    ).map<[[c.Property[], c.Property[]], number]>(_ => [[_[2], _[3]], _[4]])
+
+    tt2 = tt.map<[[c.Property[], c.Property[]], number]>(_ => [[_[2], _[3]], _[4]])
+
+    if (tt2.length === 0) {
+        return undefined
+    }
+
+    let [t_remove, t_op_remove] = w_select(
+        tt2
+    )
+
+    let res: [c.Property, c.Property[], c.Property[]] = [t, t_remove, t_op_remove]
+    return res
+}
+
+function w_select<T>(a: [T, number][]): T {
+    // Calculate total weight
+    const totalWeight = a.reduce((sum, [, weight]) => sum + weight, 0);
+    
+    // Generate random number between 0 and totalWeight
+    const randomValue = Math.random() * totalWeight;
+    
+    // Find which item corresponds to the random value
+    let cumulativeWeight = 0;
+    for (const [item, weight] of a) {
+        cumulativeWeight += weight;
+        if (randomValue <= cumulativeWeight) {
+            return item;
+        }
+    }
+    
+    // Fallback (shouldn't reach here due to floating point precision)
+    return a[a.length - 1][0];
+}
 
 export function card_choices(card: Card, cc: Card[]) {
     let res = c.rr_by_role[card.r].find(_ => _[0] === card.p)?.[1]
@@ -36,7 +84,6 @@ export function card_choices(card: Card, cc: Card[]) {
 
                 if (p < 0) {
                     let exists = cc.find(c => c.p === -p)
-                    console.log(exists)
                     if (exists) {
                         return false
                     }
@@ -53,6 +100,17 @@ export function card_choices(card: Card, cc: Card[]) {
             return true
         }
     })
+}
+
+export function tactic_string(p: c.Property) {
+    for (let key of Object.keys(c.PP)) {
+        if (c.PP[key] === p) {
+            let res = key.replace(/t_/, '')
+            .replace(/_/g, ' ')
+
+            return res.split(' ').map(_ => _[0].toUpperCase() + _.slice(1)).join(' ')
+        }
+    }
 }
 
 export function prop_string(p: c.Property) {
