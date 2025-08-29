@@ -446,6 +446,9 @@ function render_board_bg(color: Color, color2: Color) {
 
 function render_gameplay2() {
 
+    //render_board_bg2(colors.lightgray, colors.gray)
+    render_board_bg2(colors.pink, colors.sand)
+
     if (cc.turn === black) {
         render_ai_cat_bg()
     }
@@ -532,7 +535,7 @@ function render_my_turn() {
 
     let a = Math.sin(t * 0.002) * 8
     text(`[${colors.yellow}]Select a[/] [${colors.white}]piece action[/] [${colors.yellow}]to play[/]`, 112 + a, 800, 110, { gap: 12, outline: 12, wave: 2 })
-    text(`Your Turn`, 512 - a, 1000, 140, { gap: 12, outline: 8, wave: 1 })
+    text(`Your Turn`, 512 - a, 1000, 140, { gap: 12 + a * 0.5, outline: 8, wave: 1 })
 
     text(`or`, 1550, 910, 80, { outline: 8 })
 
@@ -589,7 +592,7 @@ function render_card(c: Card, speed?: boolean) {
     if (is_selected) {
 
 
-        circ_mask(x + 100, y - 300, 200, colors.black)
+        circ_mask(x + 100, y - 300, 200, colors.sand)
 
         y -= 60
 
