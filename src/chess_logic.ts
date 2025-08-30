@@ -50,6 +50,17 @@ export function tactic_choices(cc: Cards) {
     return res
 }
 
+export function expose_king_and_pawn(cc: Cards) {
+    let p_king = cc.cards.find(_ => _.c !== cc.turn && _.r === c.king)!
+    let p_pawn = cc.cards.find(_ => _.c !== cc.turn && _.r === c.pawn)!
+
+    let p_king_p = w_select(c.pp_king)
+    let p_pawn_p = w_select(c.pp_pawn)
+
+    p_king.p = p_king_p === -1 ? p_king.p : p_king_p
+    p_pawn.p = p_pawn_p === -1 ? p_pawn.p : p_pawn_p
+}
+
 function w_select<T>(a: [T, number][]): T {
     // Calculate total weight
     const totalWeight = a.reduce((sum, [, weight]) => sum + weight, 0);

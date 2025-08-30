@@ -426,3 +426,22 @@ export const t_by_tactic_chances: [[Property, Tactic[]], number][] = [
     [[t_arabian_mate, tt_arabian_mate], 1],
     [[t_backrank_mate, tt_backrank_mate], 1],
 ]
+
+
+export const pp_king: [Property, number][] = [
+    [-1, 8],
+    [p_king_weakened, 3],
+    [p_king_exposed, 2],
+    [p_king_running, 1]
+]
+
+export const pp_pawn: [Property, number][] = [
+    [-1, 8],
+    [p_pawn_center, 4],
+    [p_pawn_tension, 3],
+    [p_pawn_chain, 2],
+    [p_pawn_doubled_pawn, 1],
+    [p_pawn_isolated_pawn, 1],
+    [p_pawn_backward_pawn, 1],
+    [p_pawn_passed_pawn, 1]
+]

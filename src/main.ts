@@ -2,7 +2,7 @@ import { Loop, TouchMouse } from './loop_input';
 import './style.css'
 import { appr, box_intersect, type XY, type XYWH } from './util';
 import { play, make_sounds, type Sounds } from './play_sounds'
-import { card_choices as _card_choices, cards, prop_string, tactic_choices, tactic_string, type Card, type Cards } from './chess_logic'
+import { card_choices as _card_choices, cards, expose_king_and_pawn, prop_string, tactic_choices, tactic_string, type Card, type Cards } from './chess_logic'
 import { bishop, black, king, knight, pawn, queen, rook, white, type Property } from './choices';
 import { arr_shuffle } from './random';
 
@@ -128,6 +128,7 @@ function _init() {
     t = 0
 
     is_intro = true
+    is_intro = false
 
     cursor_box0 = [hw, hh]
     cursor_box = [hw, hh, 80, 40]
@@ -153,6 +154,7 @@ function _update(dt: number) {
         t_tactic_found -= dt
 
         if (t_tactic_found <= 0) {
+            exchange_pieces()
             tactic_found = undefined
             end_turn()
         }
@@ -378,6 +380,16 @@ function search_tactics(n: number = 15000) {
     t_tactics = n
     t_tactics_nb = n
     a_tactics_sound = play(sounds.tactic)
+}
+
+function exchange_pieces() {
+    let [_, r, r2] = tactic_found!
+
+    cc.cards = cc.cards.filter(_ => !r.find(a => _.c === white && _.r === a))
+    cc.cards = cc.cards.filter(_ => !r2.find(a => _.c === black && _.r === a))
+
+
+    expose_king_and_pawn(cc)
 }
 
 function end_game() {
@@ -667,10 +679,12 @@ function render_card(c: Card, speed?: boolean) {
     let prop_change = prop_changes.find(_ => _[0] === c)
 
     if (prop_change) {
+        let p_x = prop_string(prop_change[1])!.length > 8 ? x - 80 : x
         let color = t_prop_change % 350 < 200 ? colors.white : colors.purple
-        text(`[${color}]${prop_string(prop_change[1])!}[/]`, x, y, color === colors.white ? 50 : 60, { shadow: 4 })
+        text(`[${color}]${prop_string(prop_change[1])!}[/]`, p_x, y, color === colors.white ? 50 : 60, { shadow: 4 })
     } else {
-        text(prop_string(c.p)!, x, y, 50, { shadow: 4 })
+        let p_x = prop_string(c.p)!.length > 8 ? x - 80 : x
+        text(prop_string(c.p)!, p_x, y, 50, { shadow: 4 })
     }
 
     //cx.fillRect(...card_box(c))
