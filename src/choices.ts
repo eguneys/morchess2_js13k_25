@@ -294,110 +294,110 @@ export type Tactic = [Property[], Property[], Property[], Property[], number]
 
 
 export const tt_trap_piece: Tactic[] = [
-    [[p_bishop_active], [], [], [bishop], 1],
-    [[p_bishop_pin], [], [], [bishop], 1],
-    [[p_knight_eye_king], [], [], [knight], 1],
-    [[p_knight_bother], [], [], [knight], 1],
-    [[p_knight_invade], [], [], [knight], 1],
-    [[p_queen_eye_king], [], [], [queen], 1],
-    [[p_queen_infiltrate], [], [], [queen], 1],
+    [[p_bishop_active], [], [], [bishop], 10],
+    [[p_bishop_pin], [], [], [bishop], 15],
+    [[p_knight_eye_king], [], [], [knight], 10],
+    [[p_knight_bother], [], [], [knight], 10],
+    [[p_knight_invade], [], [], [knight], 20],
+    [[p_queen_eye_king], [], [], [queen], 10],
+    [[p_queen_infiltrate], [], [], [queen], 10],
 ]
 
 export const tt_knight_fork: Tactic[] = [
-    [[p_knight_bother], [p_bishop_defend_king], [], [bishop], 1],
-    [[p_knight_bother], [p_bishop_eye_king], [], [bishop], 1],
-    [[p_knight_bother], [p_bishop_passive], [], [bishop], 1],
+    [[p_knight_bother], [p_bishop_defend_king], [], [bishop], 10],
+    [[p_knight_bother], [p_bishop_eye_king], [], [bishop], 20],
+    [[p_knight_bother], [p_bishop_passive], [], [bishop], 5],
 
-    [[p_knight_flank], [p_bishop_defend_king], [], [bishop], 1],
-    [[p_knight_flank], [p_bishop_eye_king], [], [bishop], 1],
-    [[p_knight_flank], [p_bishop_passive], [], [bishop], 1],
+    [[p_knight_flank], [p_bishop_defend_king], [], [bishop], 7],
+    [[p_knight_flank], [p_bishop_eye_king], [], [bishop], 17],
+    [[p_knight_flank], [p_bishop_passive], [], [bishop], 7],
 
-    [[p_knight_invade], [p_bishop_defend_king], [], [bishop], 1],
-    [[p_knight_invade], [p_bishop_eye_king], [], [bishop], 1],
-    [[p_knight_invade], [p_bishop_passive], [], [bishop], 1],
+    [[p_knight_invade], [p_bishop_defend_king], [], [bishop], 7],
+    [[p_knight_invade], [p_bishop_eye_king], [], [bishop], 13],
+    [[p_knight_invade], [p_bishop_passive], [], [bishop], 17],
 
-    [[p_knight_outpost], [p_bishop_defend_king], [], [bishop], 1],
-    [[p_knight_outpost], [p_bishop_eye_king], [], [bishop], 1],
-    [[p_knight_outpost], [p_bishop_passive], [], [bishop], 1],
+    [[p_knight_outpost], [p_bishop_defend_king], [], [bishop], 30],
+    [[p_knight_outpost], [p_bishop_eye_king], [], [bishop], 40],
+    [[p_knight_outpost], [p_bishop_passive], [], [bishop], 20],
 
-    [[p_knight_bother], [p_queen_eye_king], [], [queen], 1],
-    [[p_knight_bother], [p_queen_passive], [], [queen], 1],
+    [[p_knight_bother], [p_queen_eye_king], [], [queen], 17],
+    [[p_knight_bother], [p_queen_passive], [], [queen], 21],
 
-    [[p_knight_flank], [p_queen_eye_king], [], [queen], 1],
-    [[p_knight_flank], [p_queen_passive], [], [queen], 1],
+    [[p_knight_flank], [p_queen_eye_king], [], [queen], 13],
+    [[p_knight_flank], [p_queen_passive], [], [queen], 7],
 
-    [[p_knight_invade], [p_queen_eye_king], [], [queen], 1],
-    [[p_knight_invade], [p_queen_passive], [], [queen], 1],
+    [[p_knight_invade], [p_queen_eye_king], [], [queen], 17],
+    [[p_knight_invade], [p_queen_passive], [], [queen], 13],
 
-    [[p_knight_outpost], [p_queen_eye_king], [], [queen], 1],
-    [[p_knight_outpost], [p_queen_passive], [], [queen], 1],
+    [[p_knight_outpost], [p_queen_eye_king], [], [queen], 37],
+    [[p_knight_outpost], [p_queen_passive], [], [queen], 21],
 
 
-    [[p_knight_bother], [p_rooks_connected], [], [rook], 1],
-    [[p_knight_bother], [p_rooks_doubled], [], [rook], 1],
-    [[p_knight_bother], [p_rooks_lift], [], [rook], 1],
-    [[p_knight_bother], [p_rooks_home], [], [rook], 1],
-    [[p_knight_bother], [p_rooks_on_open_file], [], [rook], 1],
-    [[p_knight_bother], [p_rooks_on_the_7th], [], [rook], 1],
+    [[p_knight_bother], [p_rooks_connected], [], [rook], 13],
+    [[p_knight_bother], [p_rooks_doubled], [], [rook], 17],
+    [[p_knight_bother], [p_rooks_lift], [], [rook], 17],
+    [[p_knight_bother], [p_rooks_home], [], [rook], 11],
+    [[p_knight_bother], [p_rooks_on_open_file], [], [rook], 15],
+    [[p_knight_bother], [p_rooks_on_the_7th], [], [rook], 31],
 
-    [[p_knight_flank], [p_rooks_connected], [], [rook], 1],
-    [[p_knight_flank], [p_rooks_doubled], [], [rook], 1],
-    [[p_knight_flank], [p_rooks_lift], [], [rook], 1],
-    [[p_knight_flank], [p_rooks_home], [], [rook], 1],
-    [[p_knight_flank], [p_rooks_on_open_file], [], [rook], 1],
-    [[p_knight_flank], [p_rooks_on_the_7th], [], [rook], 1],
+    [[p_knight_flank], [p_rooks_connected], [], [rook], 10],
+    [[p_knight_flank], [p_rooks_doubled], [], [rook], 13],
+    [[p_knight_flank], [p_rooks_lift], [], [rook], 14],
+    [[p_knight_flank], [p_rooks_home], [], [rook], 18],
+    [[p_knight_flank], [p_rooks_on_open_file], [], [rook], 16],
+    [[p_knight_flank], [p_rooks_on_the_7th], [], [rook], 15],
 
-    [[p_knight_invade], [p_rooks_connected], [], [rook], 1],
-    [[p_knight_invade], [p_rooks_doubled], [], [rook], 1],
-    [[p_knight_invade], [p_rooks_lift], [], [rook], 1],
-    [[p_knight_invade], [p_rooks_home], [], [rook], 1],
-    [[p_knight_invade], [p_rooks_on_open_file], [], [rook], 1],
-    [[p_knight_invade], [p_rooks_on_the_7th], [], [rook], 1],
+    [[p_knight_invade], [p_rooks_connected], [], [rook], 21],
+    [[p_knight_invade], [p_rooks_doubled], [], [rook], 27],
+    [[p_knight_invade], [p_rooks_lift], [], [rook], 31],
+    [[p_knight_invade], [p_rooks_home], [], [rook], 21],
+    [[p_knight_invade], [p_rooks_on_open_file], [], [rook], 11],
+    [[p_knight_invade], [p_rooks_on_the_7th], [], [rook], 21],
 
-    [[p_knight_outpost], [p_rooks_connected], [], [rook], 1],
-    [[p_knight_outpost], [p_rooks_doubled], [], [rook], 1],
-    [[p_knight_outpost], [p_rooks_lift], [], [rook], 1],
-    [[p_knight_outpost], [p_rooks_home], [], [rook], 1],
-    [[p_knight_outpost], [p_rooks_on_open_file], [], [rook], 1],
-    [[p_knight_outpost], [p_rooks_on_the_7th], [], [rook], 1],
+    [[p_knight_outpost], [p_rooks_connected], [], [rook], 31],
+    [[p_knight_outpost], [p_rooks_doubled], [], [rook], 36],
+    [[p_knight_outpost], [p_rooks_lift], [], [rook], 37],
+    [[p_knight_outpost], [p_rooks_home], [], [rook], 39],
+    [[p_knight_outpost], [p_rooks_on_open_file], [], [rook], 38],
+    [[p_knight_outpost], [p_rooks_on_the_7th], [], [rook], 38],
 ]
 
 
 export const tt_skewer: Tactic[] = [
-    [[p_bishop_active], [], [bishop], [rook], 1],
-    [[p_bishop_active], [], [bishop], [queen], 1],
+    [[p_bishop_active], [], [bishop], [rook], 10],
+    [[p_bishop_active], [], [bishop], [queen], 10],
 
-    [[p_bishop_passive], [], [bishop], [rook], 1],
-    [[p_bishop_passive], [], [bishop], [queen], 1],
+    [[p_bishop_passive], [], [bishop], [rook], 5],
+    [[p_bishop_passive], [], [bishop], [queen], 5],
 
-    [[p_bishop_eye_king], [], [bishop], [rook], 1],
-    [[p_bishop_eye_king], [], [bishop], [queen], 1],
+    [[p_bishop_eye_king], [], [bishop], [rook], 30],
+    [[p_bishop_eye_king], [], [bishop], [queen], 30],
 
-    [[p_bishop_fianchetto], [], [bishop], [rook], 1],
-    [[p_bishop_fianchetto], [], [bishop], [queen], 1],
+    [[p_bishop_fianchetto], [], [bishop], [rook], 25],
+    [[p_bishop_fianchetto], [], [bishop], [queen], 25],
 
-    [[p_bishop_infiltrate], [], [bishop], [rook], 1],
-    [[p_bishop_infiltrate], [], [bishop], [queen], 1],
+    [[p_bishop_infiltrate], [], [bishop], [rook], 17],
+    [[p_bishop_infiltrate], [], [bishop], [queen], 17],
 
-    [[p_bishop_pin], [], [bishop], [rook], 1],
-    [[p_bishop_pin], [], [bishop], [queen], 1],
+    [[p_bishop_pin], [], [bishop], [rook], 18],
+    [[p_bishop_pin], [], [bishop], [queen], 18],
 ]
 
 export const tt_discovered_check: Tactic[] = [
-    [[p_bishop_eye_king, p_knight_eye_king], [], [], [], 1],
-    [[p_bishop_eye_king, p_knight_invade], [], [], [], 1],
-    [[p_bishop_eye_king, p_knight_outpost], [], [], [], 1],
+    [[p_bishop_eye_king, p_knight_eye_king], [], [], [], 30],
+    [[p_bishop_eye_king, p_knight_invade], [], [], [], 20],
+    [[p_bishop_eye_king, p_knight_outpost], [], [], [], 50],
 
-    [[p_queen_eye_king, p_knight_eye_king], [], [], [], 1],
-    [[p_queen_eye_king, p_knight_invade], [], [], [], 1],
-    [[p_queen_eye_king, p_knight_outpost], [], [], [], 1],
+    [[p_queen_eye_king, p_knight_eye_king], [], [], [], 60],
+    [[p_queen_eye_king, p_knight_invade], [], [], [], 50],
+    [[p_queen_eye_king, p_knight_outpost], [], [], [], 70],
 ]
 
 export const tt_queen_checkmate: Tactic[] = [
-    [[p_queen_eye_king, p_knight_eye_king], [], [], [], 1],
-    [[p_queen_eye_king, p_bishop_eye_king], [], [], [], 1],
-    [[p_queen_eye_king, p_rooks_on_the_7th], [], [], [], 1],
-    [[p_queen_eye_king, p_rooks_on_open_file], [], [], [], 1],
+    [[p_queen_eye_king, p_knight_eye_king], [], [], [], 30],
+    [[p_queen_eye_king, p_bishop_eye_king], [], [], [], 25],
+    [[p_queen_eye_king, p_rooks_on_the_7th], [], [], [], 40],
+    [[p_queen_eye_king, p_rooks_on_open_file], [], [], [], 35],
 ]
 
 export const tt_smothered_mate: Tactic[] = [
@@ -406,25 +406,25 @@ export const tt_smothered_mate: Tactic[] = [
 
 export const tt_arabian_mate: Tactic[] = [
     [[p_rooks_lift, p_knight_eye_king], [], [], [], 1],
-    [[p_rooks_on_the_7th, p_knight_eye_king], [], [], [], 1],
+    [[p_rooks_on_the_7th, p_knight_eye_king], [], [], [], 2],
 ]
 
 export const tt_backrank_mate: Tactic[] = [
     [[p_rooks_on_open_file], [-p_rooks_home], [], [], 1],
-    [[p_rooks_doubled], [], [], [], 1],
+    [[p_rooks_doubled], [], [], [], 5],
 ]
 
 
 export const t_by_tactic_chances: [[Property, Tactic[]], number][] = [
-    [[-1, []], 60],
+    [[-1, []], 1800],
     [[t_trap_piece, tt_trap_piece], 25],
     [[t_knight_fork, tt_knight_fork], 20],
     [[t_skewer, tt_skewer], 15],
     [[t_discovered_check, tt_discovered_check], 10],
-    [[t_queen_checkmate, tt_queen_checkmate], 1],
-    [[t_smothered_mate, tt_smothered_mate], 1],
-    [[t_arabian_mate, tt_arabian_mate], 1],
-    [[t_backrank_mate, tt_backrank_mate], 1],
+    [[t_queen_checkmate, tt_queen_checkmate], 16],
+    [[t_smothered_mate, tt_smothered_mate], 13],
+    [[t_arabian_mate, tt_arabian_mate], 13],
+    [[t_backrank_mate, tt_backrank_mate], 15],
 ]
 
 

@@ -2,7 +2,7 @@ import { Loop, TouchMouse } from './loop_input';
 import './style.css'
 import { appr, box_intersect, type XY, type XYWH } from './util';
 import { play, make_sounds, type Sounds } from './play_sounds'
-import { card_choices as _card_choices, cards, prop_string, tactic_choices, tactic_string, type Card, type Cards } from './chess_logic'
+import { card_choices as _card_choices, cards, expose_king_and_pawn, prop_string, tactic_choices, tactic_string, type Card, type Cards } from './chess_logic'
 import { bishop, black, king, knight, pawn, queen, rook, white, type Property } from './choices';
 import { arr_shuffle } from './random';
 
@@ -23,18 +23,33 @@ export function ai_play(cc: Cards) {
         let card = arr_shuffle(bb)[0]
         let ccc = card_choices(card)
 
+        if (bars.times[0] > .3 && bars.gauge < 0.2) {
+            if (Math.random() < 0.8) {
+                search_tactics(1000 + Math.random() * 4000)
+                return
+            }
+        }
+
+        if (t > 30000 && bars.times[0] > .6) {
+
+            if (Math.random() < 0.8) {
+                search_tactics(5000 + Math.random() * 8000)
+                return
+            }
+        }
+
         if (i === 0 && Math.random() < 0.08) {
-            search_tactics(3000 + Math.random() * 4000)
+            search_tactics(8000 + Math.random() * 8000)
             return
         }
         if (i > 0 && Math.random() < 0.8) {
-            search_tactics(3000 + Math.random() * 12000)
+            search_tactics(5000 + Math.random() * 12000)
             return
         }
         if (ccc === undefined || ccc.length === 0) {
             if (i === 2) {
                 t_prop_change = 1000
-                search_tactics(3000 + Math.random() * 12000)
+                search_tactics(4000 + Math.random() * 15000)
                 return
             }
         } else {
@@ -101,7 +116,14 @@ type Bars = {
 
 let bars: Bars
 
+let t_tactics_cooldown: number
+
+let t_flag_end: number
+
 function _init() {
+
+    t_flag_end = 0
+    t_tactics_cooldown = 0
 
     bars = { times: [1, 1], gauge: .5, mana: .5 }
 
@@ -138,7 +160,7 @@ function _init() {
     t = 0
 
     is_intro = true
-    is_intro = false
+    //is_intro = false
 
     cursor_box0 = [hw, hh]
     cursor_box = [hw, hh, 80, 40]
@@ -154,12 +176,47 @@ function exchange_pieces() {
 
     bars.gauge += i * .1
     bars.mana += i * .1
+
+    expose_king_and_pawn(cc)
 }
 
 
 function _update(dt: number) {
 
     bars.gauge += (bars.mana - 0.5) * .001
+
+    if (bars.gauge > 1) {
+        bars.gauge = 1
+    }
+    if (bars.gauge < 0) {
+        bars.gauge = 0
+    }
+
+
+    if (t_flag_end > 0) {
+        t_flag_end -= dt
+
+        if (t_flag_end <= 0) {
+            tactic_found = undefined
+            end_game()
+        }
+    } else {
+        if (bars.times[0] < 0) {
+            t_flag_end = 50000
+        }
+        if (bars.times[1] < 0) {
+            t_flag_end = 50000
+        }
+        
+    }
+    if (bars.times[0] > 1) {
+        bars.times[0] = 1
+    }
+    if (bars.times[1] > 1) {
+        bars.times[1] = 1
+    }
+
+
 
     if (t_mate_found > 0) {
         t_mate_found -= dt
@@ -196,7 +253,10 @@ function _update(dt: number) {
             a_tactics_sound = () => {}
         }
 
-        if (t_tactics < t_tactics_nb - 1600 && t_tactics % 200 < 20) {
+        t_tactics_cooldown -= dt
+
+        if (t_tactics < t_tactics_nb - 1600 && t_tactics_cooldown <= 0) {
+            t_tactics_cooldown = 100 + Math.random() * 300
             try_choice_tactic()
         }
     }
@@ -253,7 +313,7 @@ function _update(dt: number) {
         }
     }
 
-    is_tactics_hover = cc.turn === white && t_mate_found <= 0 && t_tactic_found <= 0 && t_tactics_result <= 0 && t_begin > 5000 && !is_intro && box_intersect(tactics_box, cursor_box)
+    is_tactics_hover = cc.turn === white && t_flag_end <= 0 && t_mate_found <= 0 && t_tactic_found <= 0 && t_tactics_result <= 0 && t_begin > 5000 && !is_intro && box_intersect(tactics_box, cursor_box)
 
     if (cursor_down) {
         cursor_bg_speed = 0.3
@@ -262,7 +322,11 @@ function _update(dt: number) {
         cursor_bg_speed = 0.6
     }
     if (cursor_up) {
-        if (t_mate_found > 0 && t_mate_found < 45000) {
+        if (t_mate_found > 0 && t_mate_found < 47000) {
+            end_game()
+            return
+        }
+        if (t_flag_end > 0 && t_flag_end < 47000) {
             end_game()
             return
         }
@@ -304,7 +368,7 @@ function _update(dt: number) {
 
     let found = selected_card ? box_intersect(card_box2(selected_card), cursor_box) : false
     for (let c of cc.cards) {
-        if (t_mate_found > 0 || t_tactic_found > 0 || t_tactics_result > 0 || t_tactics > 0 || t_s_cool > 0 || t_prop_change > 0 || t_begin <= 5000 || cc.turn === black) {
+        if (t_flag_end > 0 || t_mate_found > 0 || t_tactic_found > 0 || t_tactics_result > 0 || t_tactics > 0 || t_s_cool > 0 || t_prop_change > 0 || t_begin <= 5000 || cc.turn === black) {
             found = true
             continue
         } 
@@ -405,6 +469,7 @@ function search_tactics(n: number = 15000) {
     t_tactics = n
     t_tactics_nb = n
     a_tactics_sound = play(sounds.tactic)
+    t_tactics_cooldown = 0
 }
 
 function end_game() {
@@ -413,9 +478,11 @@ function end_game() {
 
 function end_turn() {
 
+    end_search_tactics()
+
     let i = cc.turn === black ? 0: 1
 
-    bars.times[i] -= .066
+    bars.times[i] += .036
 
     cc.turn = cc.turn === black ? white : black
 
@@ -554,6 +621,8 @@ function render_gameplay2() {
 
     if (t_begin < 5000) {
         render_begin()
+    } else if (t_flag_end > 0) {
+        render_flag_end()
     } else if (t_mate_found > 0) {
         render_mate_found()
     } else if (t_tactic_found > 0) {
@@ -623,6 +692,19 @@ function render_time_bar(y: number, progress: number) {
     rect(0, y + 8, progress * 1920, 80 - 16, colors.yellow)
 }
 
+function render_flag_end() {
+    text(`Out of [${colors.yellow}]time[/]!`, 200, 880, 110, { outline: 8, wave: 1 })
+
+    let cat = cc.turn === black ? 'Player': `[${colors.black}]Black Cat`
+    let a = Math.sin(t * 0.01) * 3
+    text(`Game Over`, 100, 500, 300, { gap: 20, outline: 30 + a, wave: 1 })
+    text(`${cat} [${colors.blue}]wins[/].`, 500, 700, 100, { gap: 20, outline: 10, wave: 1 })
+
+    if (t_flag_end < 47000) {
+        text(`[${colors.yellow}]Click[/] anywhere to [${colors.green}]restart[/].`, 100, 1000, 60, { shadow: 3, wave: 2 })
+    }
+}
+
 function render_mate_found() {
     let tactic = tactic_string(tactic_found![0])!
     let n = tactic[0] === 'A' ? 'n' :''
@@ -633,7 +715,7 @@ function render_mate_found() {
     text(`Game Over`, 100, 500, 300, { gap: 20, outline: 30 + a, wave: 1 })
     text(`${cat} [${colors.blue}]wins[/].`, 500, 700, 100, { gap: 20, outline: 10, wave: 1 })
 
-    if (t_mate_found < 45000) {
+    if (t_mate_found < 47000) {
         text(`[${colors.yellow}]Click[/] anywhere to [${colors.green}]restart[/].`, 100, 1000, 60, { shadow: 3, wave: 2 })
     }
 }
@@ -668,10 +750,12 @@ function render_my_tactics() {
 
     let dots = t % 1000 < 200 ? '.  ' : t % 1000 < 500 ? '.. ' :'...'
     text(`[${colors.yellow}]Hold on[/] Searching for [${colors.purple}]tactics[/]${dots}`, 240, 800, 110, { outline: 8, wave: 8 })
-    if (t_tactics_hint % 3 === 0) {
+    if (t_tactics_hint % 4 === 0) {
         text(`More [${colors.yellow}]time[/], higher [${colors.orange}]chances[/], but watch your [${colors.yellow}]time`, 100, 900, 80, { outline: 6, wave: 1 })
-    } else if (t_tactics_hint % 3 === 1) {
+    } else if (t_tactics_hint % 4 === 1) {
         text(`An [${colors.darkred}]exposed king[/] and [${colors.darkred}]pawn weaknesses[/], increases your [${colors.orange}]chances[/] to [${colors.sand}]fall for tactics[/].`, 60, 900, 50, { outline: 6, wave: 1 })
+    } else if (t_tactics_hint % 4 === 2) {
+        text(`A better [${colors.yellow}]evaluation[/] increases your chances to find [${colors.green}]checkmates[/].`, 60, 900, 50, { outline: 6, wave: 1 })
     } else {
         text(`[${colors.green}]Activating[/] your pieces increases your [${colors.orange}]chances[/] to [${colors.pink}]find good tactics[/].`, 100, 900, 60, { outline: 6, wave: 1 })
     }
@@ -756,7 +840,7 @@ function render_card(c: Card, speed?: boolean) {
     let prop_change = prop_changes.find(_ => _[0] === c)
 
     if (prop_change) {
-        let p_x = prop_string(prop_change[1])!.length > 8 ? x - 80 : x
+        let p_x = prop_string(prop_change[1])!.length > 7 ? x - 80 : x
         let color = t_prop_change % 350 < 200 ? colors.white : colors.purple
         text(`[${color}]${prop_string(prop_change[1])!}[/]`, p_x, y, color === colors.white ? 50 : 60, { shadow: 4 })
     } else {

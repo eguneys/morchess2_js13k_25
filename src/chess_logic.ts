@@ -21,6 +21,45 @@ function card(r: c.Role, p: c.Property, color: c.Color): Card {
     return { c: color, r, p, pos }
 }
 
+function king_chances(p: c.Property) {
+
+    if (p === c.p_king_castled) {
+        return 0
+    }
+    if (p === c.p_king_weakened) {
+        return .3
+    }
+    if (p === c.p_king_exposed) {
+
+        return .66
+    }
+    if (p === c.p_king_running) {
+        return 1
+    }
+    return .1
+}
+
+function pawn_chances(p: c.Property) {
+
+    let pp = {
+        [c.p_pawn_home]: 0,
+        [c.p_pawn_center]: 0,
+        [c.p_pawn_tension]: .2,
+        [c.p_pawn_space]: .1,
+        [c.p_pawn_extend]: .3,
+        [c.p_pawn_thorn]: 0,
+        [c.p_pawn_outpost]: 0,
+
+
+        [c.p_pawn_chain]: 0,
+        [c.p_pawn_doubled_pawn]: .4,
+        [c.p_pawn_isolated_pawn]: .5,
+        [c.p_pawn_backward_pawn]: .3,
+    }
+
+    return pp[p]
+}
+
 export function tactic_choices(cc: Cards) {
     let us = cc.cards.filter(_ => _.c === cc.turn)
     let them = cc.cards.filter(_ => _.c !== cc.turn)
@@ -29,6 +68,19 @@ export function tactic_choices(cc: Cards) {
 
     if (t === -1) {
         return undefined
+    }
+
+    if (tactic_string(t)!.includes('ate')) {
+        let p_king = cc.cards.find(_ => _.c !== cc.turn && _.r === c.king)!
+        let p_pawn = cc.cards.find(_ => _.c !== cc.turn && _.r === c.pawn)!
+
+        let k = king_chances(p_king.p) * 0.5
+        let p = pawn_chances(p_pawn.p) * 0.5
+
+        if (Math.random() > (k + p)) {
+            return undefined
+        }
+
     }
 
     let tt2 = tt.filter(_ =>
