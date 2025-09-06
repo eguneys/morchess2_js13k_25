@@ -416,11 +416,11 @@ export const tt_backrank_mate: Tactic[] = [
 
 
 export const t_by_tactic_chances: [[Property, Tactic[]], number][] = [
-    [[-1, []], 1],
-    [[t_trap_piece, tt_trap_piece], 1],
-    [[t_knight_fork, tt_knight_fork], 1],
-    [[t_skewer, tt_skewer], 1],
-    [[t_discovered_check, tt_discovered_check], 1],
+    [[-1, []], 60],
+    [[t_trap_piece, tt_trap_piece], 25],
+    [[t_knight_fork, tt_knight_fork], 20],
+    [[t_skewer, tt_skewer], 15],
+    [[t_discovered_check, tt_discovered_check], 10],
     [[t_queen_checkmate, tt_queen_checkmate], 1],
     [[t_smothered_mate, tt_smothered_mate], 1],
     [[t_arabian_mate, tt_arabian_mate], 1],

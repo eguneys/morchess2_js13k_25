@@ -2,7 +2,7 @@ import { Loop, TouchMouse } from './loop_input';
 import './style.css'
 import { appr, box_intersect, type XY, type XYWH } from './util';
 import { play, make_sounds, type Sounds } from './play_sounds'
-import { card_choices as _card_choices, cards, expose_king_and_pawn, prop_string, tactic_choices, tactic_string, type Card, type Cards } from './chess_logic'
+import { card_choices as _card_choices, cards, prop_string, tactic_choices, tactic_string, type Card, type Cards } from './chess_logic'
 import { bishop, black, king, knight, pawn, queen, rook, white, type Property } from './choices';
 import { arr_shuffle } from './random';
 
@@ -93,7 +93,17 @@ let tactic_found: [Property, Property[], Property[]] | undefined
 let t_tactic_found: number
 let t_mate_found: number
 
+type Bars = {
+    times: XY,
+    gauge: number
+    mana: number
+}
+
+let bars: Bars
+
 function _init() {
+
+    bars = { times: [1, 1], gauge: .5, mana: .5 }
 
     t_mate_found = 0
     t_tactic_found = 0
@@ -138,8 +148,18 @@ function _init() {
     cursor_bg_speed_lerping = 1
 }
 
+function exchange_pieces() {
+
+    let i = cc.turn === black ? -1 : 1
+
+    bars.gauge += i * .1
+    bars.mana += i * .1
+}
+
 
 function _update(dt: number) {
+
+    bars.gauge += (bars.mana - 0.5) * .001
 
     if (t_mate_found > 0) {
         t_mate_found -= dt
@@ -162,6 +182,11 @@ function _update(dt: number) {
 
     if (t_tactics > 0) {
         t_tactics -= dt
+
+        if (t_tactics % 100 < 50) {
+            let i = cc.turn === black ? 0 : 1
+            bars.times[i] -= .001
+        }
 
         if (t_tactics <= 0) {
 
@@ -382,21 +407,16 @@ function search_tactics(n: number = 15000) {
     a_tactics_sound = play(sounds.tactic)
 }
 
-function exchange_pieces() {
-    let [_, r, r2] = tactic_found!
-
-    cc.cards = cc.cards.filter(_ => !r.find(a => _.c === white && _.r === a))
-    cc.cards = cc.cards.filter(_ => !r2.find(a => _.c === black && _.r === a))
-
-
-    expose_king_and_pawn(cc)
-}
-
 function end_game() {
     _init()
 }
 
 function end_turn() {
+
+    let i = cc.turn === black ? 0: 1
+
+    bars.times[i] -= .066
+
     cc.turn = cc.turn === black ? white : black
 
     if (cc.turn === black) {
@@ -519,7 +539,10 @@ function render_board_bg(color: Color, color2: Color) {
 function render_gameplay2() {
 
     //render_board_bg2(colors.lightgray, colors.gray)
-    render_board_bg2(colors.pink, colors.sand)
+    //render_board_bg2(colors.pink, colors.sand)
+    render_board_bg2(colors.purple, colors.darkred)
+
+    render_ui_in_bg()
 
     if (cc.turn === black) {
         render_ai_cat_bg()
@@ -544,6 +567,60 @@ function render_gameplay2() {
     } else {
         render_ai_turn()
     }
+}
+
+function render_ui_in_bg() {
+
+    render_time_bar(190, bars.times[0])
+    text(`[${colors.black}]Cat time`, 220, 180, 48, { bold: true, outline: 4 })
+
+    render_time_bar(590, bars.times[1])
+    text(`You time`, 220, 580, 48, { bold: true, outline: 6 })
+
+    let tilt = (bars.mana - 0.5) * .2
+
+    cx.save()
+    cx.translate(1920/2, 0)
+    cx.rotate(tilt + Math.sin(t * 0.01) * .01 + Math.sin(t * 0.03) * 0.005)
+    cx.translate(-1920/2, 0)
+    rect(0, 360 + 40 - 4, 1920, 32 + 8, colors.sand)
+    rect(0, 360 + 40, 1920 / 2, 32, colors.black)
+    rect(1920/2, 360 + 40, 1920/ 2, 32, colors.white)
+
+    render_yarn(400, bars.gauge)
+    text('evaluation', 1920/ 2, 380, 30, { bold: true, shadow: 2 })
+    cx.restore()
+
+}
+
+function render_yarn(y: number, x: number) {
+    x = x * 1920 - 60
+
+    let size = 200
+    let scale = size / 300
+    cx.save()
+    cx.translate(x, y - 60)
+    cx.scale(scale, scale)
+    cx.lineWidth = 10
+    cx.strokeStyle = colors.black
+    cx.stroke(paths.yarn)
+
+
+    for (let i = 0; i < 4; i++) {
+        cx.translate(size / 2, size / 2)
+        cx.rotate(i * 1.6)
+        cx.translate(-size / 2, -size / 2)
+        cx.stroke(paths.yarn)
+    }
+    cx.restore()
+}
+
+function render_time_bar(y: number, progress: number) {
+
+    rect(0, y, 1920, 80, colors.black)
+    rect(0, y + 8, 1920, 80 - 16, colors.red)
+
+    rect(0, y + 8, progress * 1920, 80 - 16, colors.yellow)
 }
 
 function render_mate_found() {
@@ -692,7 +769,8 @@ function render_card(c: Card, speed?: boolean) {
     if (is_selected) {
 
 
-        circ_mask(x + 100, y - 300, 200, colors.sand)
+        //circ_mask(x + 100, y - 300, 200, colors.sand)
+        circ_mask(x + 100, y - 300, 200, colors.darkred)
 
         y -= 60
 
@@ -1019,6 +1097,20 @@ function paw(x: number, y: number, size: number = 280, opts: PieceOptions = {}) 
 }
 
 let paths = {
+    yarn: new Path2D(`M150,150
+C130,120 100,130 90,160
+C80,190 110,210 140,200
+C170,190 180,160 160,140
+C140,120 110,110 100,130
+C90,150 120,170 150,160
+C180,150 190,120 170,100
+C150,80 120,90 110,120
+C100,150 130,180 160,170
+C190,160 200,130 180,110
+C160,90 130,100 120,130
+C110,160 140,190 170,180
+C200,170 210,140 190,120
+C170,100 140,110 130,140`),
     paw: new Path2D(`M 324.5,282.26
 c -11.49-19.8-36.22-33.5-64.9-33.5
 s -53.41,13.7-64.9,33.5
